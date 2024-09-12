@@ -22,6 +22,7 @@ public class Shipment extends AbstractEntity {
     //If we want destination, we need to embed this differently
     //@Embedded
     //private Address origin;
+    @Getter
     private UUID orderId;
     @OneToOne(cascade = CascadeType.REMOVE)
     private APackage aPackage;
