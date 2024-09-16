@@ -15,6 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Setter
 public class Product extends AbstractEntity{
+    //Should probably have more complex formats
     private Number stock;
     private boolean retired;
     private String storageLocation;

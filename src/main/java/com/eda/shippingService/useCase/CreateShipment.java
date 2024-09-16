@@ -2,12 +2,20 @@ package com.eda.shippingService.useCase;
 
 import com.eda.shippingService.model.entity.Shipment;
 import com.eda.shippingService.repo.ShipmentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CreateShipment {
 
-    private ShipmentRepository shipmentRepository;
+    private final ShipmentRepository shipmentRepository;
 
-    public Object createShipment(Shipment shipment) {
+    @Autowired
+    public CreateShipment(ShipmentRepository shipmentRepository) {
+        this.shipmentRepository = shipmentRepository;
+    }
+
+    public Shipment createShipment(Shipment shipment) {
 
         if (shipment.getId() != null && shipmentRepository.findById(shipment.getId()).isPresent()) {
             throw new IllegalArgumentException(String.format("Shipment with Shipment ID %s already exists.", shipment.getId()));
