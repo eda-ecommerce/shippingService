@@ -5,20 +5,13 @@ import lombok.*;
 @AllArgsConstructor
 //Mark as value object, overrides equals/hashcode
 @Value
+@NoArgsConstructor(force = true)
 public class Address {
     String street;
     String city;
     String state;
     String postalCode;
     String country;
-
-    public Address() {
-        this.street = "";
-        this.city = "";
-        this.state = "";
-        this.postalCode = "";
-        this.country = "";
-    }
 
     //You would use some Validation framework here
     public boolean validate(){
