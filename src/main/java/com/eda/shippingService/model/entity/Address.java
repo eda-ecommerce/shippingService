@@ -1,18 +1,26 @@
 package com.eda.shippingService.model.entity;
 
-import jakarta.persistence.Embeddable;
 import lombok.*;
 
-@Embeddable
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+//Mark as value object, overrides equals/hashcode
+@Value
 public class Address {
-    private String street;
-    private String city;
-    private String state;
-    private String postalCode;
-    private String country;
+    String street;
+    String city;
+    String state;
+    String postalCode;
+    String country;
 
+    public Address() {
+        this.street = "";
+        this.city = "";
+        this.state = "";
+        this.postalCode = "";
+        this.country = "";
+    }
+
+    //You would use some Validation framework here
     public boolean validate(){
         return country.equals("DE");
     }
