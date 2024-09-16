@@ -16,12 +16,29 @@ import java.util.UUID;
 @Setter
 @Entity
 public class Shipment extends AbstractEntity {
-
+    //Due to embedded, this is a bit more complex
     @Embedded
+    @AttributeOverrides(
+            {
+                    @AttributeOverride(name = "street", column = @Column(name = "destination_street")),
+                    @AttributeOverride(name = "city", column = @Column(name = "destination_city")),
+                    @AttributeOverride(name = "state", column = @Column(name = "destination_state")),
+                    @AttributeOverride(name = "postalCode", column = @Column(name = "destination_postalCode")),
+                    @AttributeOverride(name = "country", column = @Column(name = "destination_country"))
+            }
+    )
     private Address destination;
-    //If we want destination, we need to embed this differently
-    //@Embedded
-    //private Address origin;
+    @Embedded
+    @AttributeOverrides(
+            {
+                    @AttributeOverride(name = "street", column = @Column(name = "origin_street")),
+                    @AttributeOverride(name = "city", column = @Column(name = "origin_city")),
+                    @AttributeOverride(name = "state", column = @Column(name = "origin_state")),
+                    @AttributeOverride(name = "postalCode", column = @Column(name = "origin_postalCode")),
+                    @AttributeOverride(name = "country", column = @Column(name = "origin_country"))
+            }
+    )
+    private Address origin;
     @Getter
     private UUID orderId;
     @OneToOne(cascade = CascadeType.REMOVE)
@@ -46,12 +63,9 @@ public class Shipment extends AbstractEntity {
         this.aPackage.assignTrackingNumber(trackingNumber);
     }
 
-    public void validate()
+    public boolean validateAddresses()
     {
-        if (!destination.validate())
-        {
-            throw new IllegalArgumentException("Destination is not in Germany");
-        }
+        return destination.validate() && origin.validate();
     }
 
     public boolean checkContents(){
@@ -66,6 +80,4 @@ public class Shipment extends AbstractEntity {
         }
         return true;
     }
-
-    //TODO check if the contents of the Package match the requested products
 }
