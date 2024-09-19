@@ -1,5 +1,6 @@
 package com.eda.shippingService.useCase.commands;
 
+import com.eda.shippingService.adapters.incoming.web.CreateShipmentRequestDTO;
 import com.eda.shippingService.model.entity.Shipment;
 import com.eda.shippingService.adapters.outgoing.repo.ShipmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +16,11 @@ public class CreateShipment {
         this.shipmentRepository = shipmentRepository;
     }
 
-    public Shipment handle(Shipment shipment) {
-
-        if (shipment.getId() != null && shipmentRepository.findById(shipment.getId()).isPresent()) {
-            throw new IllegalArgumentException(String.format("Shipment with Shipment ID %s already exists.", shipment.getId()));
+    public Shipment handle(CreateShipmentRequestDTO shipment) {
+        if (shipment.orderId() != null && shipmentRepository.findByOrderId(shipment.orderId()) != null) {
+            throw new IllegalArgumentException(String.format("Shipment with Order ID %s already exists.", shipment.orderId()));
         }
 
-        if (shipment.getOrderId() != null && shipmentRepository.findByOrderId(shipment.getOrderId()) != null) {
-            throw new IllegalArgumentException(String.format("Shipment with Order ID %s already exists.", shipment.getOrderId()));
-        }
-
-        return shipmentRepository.save(shipment);
+        return shipmentRepository.save(shipment.toEntity());
     }
 }

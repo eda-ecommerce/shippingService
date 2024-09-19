@@ -20,4 +20,13 @@ public record AddressDTO(
                 address.getCountry()
         );
     }
+    public Address toEntity(){
+        return new Address(
+                this.street(),
+                this.city(),
+                this.state(),
+                this.postalCode(),
+                this.country()
+        );
+    }
 }

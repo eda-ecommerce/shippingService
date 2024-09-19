@@ -18,7 +18,7 @@ public record ShipmentDTO(
         );
    }
 
-   public ShipmentDTO fromEntity(Shipment shipment){
+   public static ShipmentDTO fromEntity(Shipment shipment){
         return new ShipmentDTO(
                 shipment.getId(),
                 shipment.getDestination(),
