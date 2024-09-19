@@ -1,8 +1,18 @@
 package com.eda.shippingService;
 
+import com.eda.shippingService.adapters.incoming.web.CreateShipmentRequestDTO;
+import com.eda.shippingService.model.dto.AddressDTO;
+import com.eda.shippingService.model.entity.*;
+import com.eda.shippingService.useCase.commands.CreateShipment;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.Bean;
+
+import java.util.List;
+import java.util.UUID;
 
 @SpringBootApplication
 @EntityScan("com.eda.shippingService.model.entity")
@@ -12,4 +22,15 @@ public class ShippingServiceApplication {
 		SpringApplication.run(ShippingServiceApplication.class, args);
 	}
 
+	@Bean
+	@Autowired
+	public CommandLineRunner loadData(CreateShipment createShipment) {
+
+		return args -> {
+			AddressDTO origin = new AddressDTO("123 Origin St", "Origin City", "Origin State", "12345", "Origin Country");
+			AddressDTO destination = new AddressDTO("456 Destination St", "Destination City", "Destination State", "67890", "Destination Country");
+			CreateShipmentRequestDTO shipment = new CreateShipmentRequestDTO(UUID.randomUUID(), UUID.randomUUID(),destination,origin, List.of(new OrderLineItem(UUID.randomUUID(), 3)));
+			createShipment.handle(shipment);
+		};
+	}
 }
