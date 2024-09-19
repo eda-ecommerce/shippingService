@@ -1,4 +1,4 @@
-package com.eda.shippingService.model.entity.dto;
+package com.eda.shippingService.model.dto;
 
 import com.eda.shippingService.model.entity.OrderLineItem;
 

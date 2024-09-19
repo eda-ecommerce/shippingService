@@ -1,4 +1,4 @@
-package com.eda.shippingService.repo;
+package com.eda.shippingService.adapters.outgoing.repo;
 
 import com.eda.shippingService.model.entity.Shipment;
 import org.springframework.data.repository.CrudRepository;

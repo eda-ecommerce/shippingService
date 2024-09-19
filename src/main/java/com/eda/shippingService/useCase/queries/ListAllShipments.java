@@ -1,6 +1,6 @@
-package com.eda.shippingService.useCase;
+package com.eda.shippingService.useCase.queries;
 
-import com.eda.shippingService.repo.ShipmentRepository;
+import com.eda.shippingService.adapters.outgoing.repo.ShipmentRepository;
 
 public class ListAllShipments {
 
