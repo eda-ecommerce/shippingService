@@ -46,6 +46,8 @@ public class Shipment extends AbstractEntity {
     @ElementCollection
     private List<OrderLineItem> requestedProducts;
 
+    private ShipmentStatus status;
+
     public Integer getProductQuantity(UUID productId){
         for (OrderLineItem orderLineItem : requestedProducts){
             if (orderLineItem.getProductId().equals(productId)){
@@ -57,6 +59,7 @@ public class Shipment extends AbstractEntity {
 
     public void addPackage(APackage aPackage){
         this.aPackage = aPackage;
+        this.status = ShipmentStatus.PACKAGED;
     }
 
     public void assignTrackingNumber(UUID trackingNumber){
@@ -80,4 +83,19 @@ public class Shipment extends AbstractEntity {
         }
         return true;
     }
+
+    public void send(){
+        if (this.status != ShipmentStatus.PACKAGED){
+            throw new IllegalStateException("Shipment must be packaged before it can be sent");
+        }
+        this.status = ShipmentStatus.SHIPPED;
+    }
+
+    public void delivered(){
+        if (this.status != ShipmentStatus.SHIPPED){
+            throw new IllegalStateException("Shipment must be shipped before it can be delivered");
+        }
+        this.status = ShipmentStatus.DELIVERED;
+    }
+
 }

@@ -5,6 +5,7 @@ import lombok.*;
 @AllArgsConstructor
 //Mark as value object, overrides equals/hashcode
 @Value
+@Getter
 @NoArgsConstructor(force = true)
 public class Address {
     String street;
