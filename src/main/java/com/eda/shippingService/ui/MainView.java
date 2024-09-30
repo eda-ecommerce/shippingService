@@ -1,8 +1,8 @@
 package com.eda.shippingService.ui;
 
 
-import com.eda.shippingService.model.entity.Shipment;
-import com.eda.shippingService.adapters.outgoing.repo.ShipmentRepository;
+import com.eda.shippingService.domain.entity.Shipment;
+import com.eda.shippingService.infrastructure.repo.ShipmentRepository;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;

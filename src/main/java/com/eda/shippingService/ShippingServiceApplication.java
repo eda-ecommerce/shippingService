@@ -1,9 +1,9 @@
 package com.eda.shippingService;
 
-import com.eda.shippingService.adapters.incoming.web.CreateShipmentRequestDTO;
-import com.eda.shippingService.model.dto.AddressDTO;
-import com.eda.shippingService.model.entity.*;
-import com.eda.shippingService.useCase.commands.CreateShipment;
+import com.eda.shippingService.domain.entity.OrderLineItem;
+import com.eda.shippingService.domain.dto.incoming.CreateShipmentRequestDTO;
+import com.eda.shippingService.domain.dto.outgoing.AddressDTO;
+import com.eda.shippingService.application.commandHandlers.CreateShipment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

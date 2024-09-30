@@ -1,6 +1,6 @@
 package com.eda.shippingService.model;
 
-import com.eda.shippingService.model.entity.Product;
+import com.eda.shippingService.domain.entity.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

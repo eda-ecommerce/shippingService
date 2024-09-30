@@ -1,6 +1,6 @@
 package com.eda.shippingService.model;
 
-import com.eda.shippingService.model.entity.*;
+import com.eda.shippingService.domain.entity.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
