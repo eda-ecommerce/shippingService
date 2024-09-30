@@ -1,6 +1,5 @@
 package com.eda.shippingService.domain.dto.outgoing;
 import com.eda.shippingService.domain.entity.*;
-import com.eda.shippingService.model.entity.*;
 
 import java.util.List;
 import java.util.UUID;

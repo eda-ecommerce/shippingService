@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @SpringBootApplication
-@EntityScan("com.eda.shippingService.model.entity")
+@EntityScan("com.eda.shippingService.domain.entity")
 public class ShippingServiceApplication {
 
 	public static void main(String[] args) {

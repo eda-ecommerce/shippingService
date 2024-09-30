@@ -1,7 +1,8 @@
 package com.eda.shippingService.application.commandHandlers;
 
 import com.eda.shippingService.domain.dto.incoming.UpdateShipmentStatusRequestDTO;
-import com.eda.shippingService.application.EventPublisher;
+import com.eda.shippingService.domain.events.PackageSentEvent;
+import com.eda.shippingService.infrastructure.eventing.EventPublisher;
 import com.eda.shippingService.domain.events.PackageDeliveredEvent;
 import com.eda.shippingService.infrastructure.repo.ShipmentRepository;
 import com.eda.shippingService.domain.dto.outgoing.ShipmentDTO;
@@ -25,7 +26,7 @@ public class UpdateShipmentStatus {
             switch (request.shipmentStatus()){
                 case IN_DELIVERY -> {
                     shipment.setStatus(ShipmentStatus.IN_DELIVERY);
-                    //TODO eventPublisher.publish();
+                    eventPublisher.publish(new PackageSentEvent(shipment.getAPackage()));
                     shipmentRepository.save(shipment);
                 }
                 case DELIVERED -> {

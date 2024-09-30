@@ -1,4 +1,4 @@
-package com.eda.shippingService.domain.events;
+package com.eda.shippingService.domain.events.common;
 
 import lombok.Getter;
 import org.springframework.lang.Nullable;
@@ -6,20 +6,19 @@ import org.springframework.lang.Nullable;
 import java.util.UUID;
 
 @Getter
-public abstract class DomainEvent {
+public abstract class Message<T> {
    @Nullable
+   private final UUID messageId;
    private final UUID eventKey;
    private final long timestamp;
-   private final UUID messageId;
 
-   private DomainEventPayload payload;
+   private final T payload;
 
-   public DomainEvent(@Nullable UUID eventKey, DomainEventPayload payload) {
+   public Message(@Nullable UUID eventKey, T payload) {
       this.eventKey = eventKey;
       this.timestamp = System.currentTimeMillis();
       this.messageId = UUID.randomUUID();
       this.payload = payload;
    }
-
 }
 
