@@ -8,4 +8,9 @@ import org.springframework.stereotype.Component;
 public class BoxShipment {
 
     //TODO
+    public void handle() {
+
+        //TODO: maybe call shipment.addPackage() (?)
+        //TODO: set the shipment status to PACKAGED (?)
+    }
 }
