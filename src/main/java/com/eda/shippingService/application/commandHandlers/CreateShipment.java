@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class CreateShipment {
 
     private final ShipmentRepository shipmentRepository;
-    private ModifyStockLevel modifyStockLevel;
+    private ReserveStock reserveStock;
 
     @Autowired
     public CreateShipment(ShipmentRepository shipmentRepository) {
@@ -26,9 +26,9 @@ public class CreateShipment {
         Shipment shipmentEntity = shipment.toEntity();
 
         if (shipmentEntity.getStatus() == ShipmentStatus.REQUESTED) {
-            modifyStockLevel.decreaseStockLevel(shipmentEntity);
-            //TODO: maybe call shipment.addPackage() (?)
-            //TODO: set the shipment status to PACKAGED (?)
+            // instead of directly decreasing the stock here, we are just reserving the necessary stock amount
+            // the stock will be decreased only when the shipment is boxed.
+            reserveStock.handle(shipmentEntity);
         }
 
         return shipmentRepository.save(shipmentEntity);

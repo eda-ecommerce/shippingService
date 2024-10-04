@@ -20,12 +20,14 @@ public class Product extends AbstractEntity{
     private boolean retired;
     private String storageLocation;
     private Float weight;
+    private Number reservedStock;
 
     public Product(UUID id, Number stock) {
         this.setId(id);
         this.stock = stock;
         this.retired = false;
         this.storageLocation = RandomStringGenerator.generateRandomString(5);
+        this.reservedStock = 0;
     }
 
     public void reduceStock(Number amount) {
@@ -35,6 +37,16 @@ public class Product extends AbstractEntity{
     public void increaseStock(Number amount) {
         this.stock = this.stock.doubleValue() + amount.doubleValue();
     }
+
+    public void reserveStock(Number amount) {
+        this.reservedStock = this.reservedStock.doubleValue() + amount.doubleValue();
+    }
+
+    public void unreserveStock(Number amount) {
+        this.reservedStock = this.reservedStock.doubleValue() - amount.doubleValue();
+    }
+
+    public boolean isProductInStock() { return this.stock.doubleValue() - this.reservedStock.doubleValue() > 0; }
 
     public void retire() {
         this.retired = true;
