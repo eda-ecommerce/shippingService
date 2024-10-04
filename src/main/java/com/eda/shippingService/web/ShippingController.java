@@ -2,6 +2,7 @@ package com.eda.shippingService.web;
 
 import com.eda.shippingService.application.commandHandlers.*;
 import com.eda.shippingService.domain.dto.incoming.CreateShipmentRequestDTO;
+import com.eda.shippingService.domain.dto.incoming.IncomingDeliveryDTO;
 import com.eda.shippingService.domain.dto.incoming.UpdateShipmentStatusRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,14 @@ public class ShippingController {
     private SendShipment sendShipment;
 
     @Autowired
-    public ShippingController(CreateShipment createShipment, DeleteShipment deleteShipment, BoxShipment boxShipment, UpdateShipmentStatus updateShipmentStatus, ProcessIncomingDelivery processIncomingDelivery, SendShipment sendShipment) {
+    public ShippingController(
+            CreateShipment createShipment,
+            DeleteShipment deleteShipment,
+            BoxShipment boxShipment,
+            UpdateShipmentStatus updateShipmentStatus,
+            ProcessIncomingDelivery processIncomingDelivery,
+            SendShipment sendShipment
+    ) {
         this.createShipment = createShipment;
         this.deleteShipment = deleteShipment;
         this.boxShipment = boxShipment;
@@ -52,6 +60,10 @@ public class ShippingController {
     - orderConfirmed (Event) --> SendShipment()
      */
 
+    @PostMapping("/shipment/incomingDelivery")
+    public void processIncomingDelivery(@RequestBody IncomingDeliveryDTO incomingDeliveryDTO) {
+        processIncomingDelivery.handle(incomingDeliveryDTO);
+    }
 
 
 }
