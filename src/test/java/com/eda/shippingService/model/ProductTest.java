@@ -12,7 +12,7 @@ public class ProductTest {
     @BeforeEach
     void init(){
         p1 = new Product(
-                10,false, "ABC", 10f
+                10,false, "ABC", 10f, 0
         );
     }
 
