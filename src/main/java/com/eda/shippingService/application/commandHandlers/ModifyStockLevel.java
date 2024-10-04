@@ -8,15 +8,15 @@ import com.eda.shippingService.domain.events.StockIncreasedEvent;
 import com.eda.shippingService.infrastructure.eventing.EventPublisher;
 import com.eda.shippingService.infrastructure.repo.ProductRepository;
 import com.eda.shippingService.infrastructure.repo.ShipmentRepository;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 
+@Component
 public class ModifyStockLevel {
-    private ShipmentRepository shipmentRepository;
     private EventPublisher eventPublisher;
-    private Product product;
     private ProductRepository productRepository;
 
     public void increaseStockLevel(HashMap<UUID, Integer> expected) {
@@ -47,6 +47,25 @@ public class ModifyStockLevel {
                     eventPublisher.publish(new StockDecreasedEvent(UUID.randomUUID(), found));
                     productRepository.save(found);
                 }
+            }
+        }
+    }
+
+    // WIP
+    // TODO: maybe replace the redundant increaseStockLevel and decreaseStockLevel methods with this?
+    public void modifyStockLevel(HashMap<UUID, Integer> expected, Boolean increaseStock) {
+        for (UUID productId : expected.keySet()){
+            Optional<Product> product = productRepository.findById(productId);
+            if (product.isPresent()){
+                Product found = product.get();
+                if (increaseStock) {
+                    found.increaseStock(expected.get(productId));
+                    eventPublisher.publish(new StockIncreasedEvent(UUID.randomUUID(), found));
+                } else {
+                    found.reduceStock(expected.get(productId));
+                    eventPublisher.publish(new StockDecreasedEvent(UUID.randomUUID(), found));
+                }
+                productRepository.save(found);
             }
         }
     }
