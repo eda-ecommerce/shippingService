@@ -2,6 +2,7 @@ package com.eda.shippingService.application.commandHandlers;
 
 import com.eda.shippingService.domain.dto.incoming.CreateShipmentRequestDTO;
 import com.eda.shippingService.domain.entity.Shipment;
+import com.eda.shippingService.domain.entity.ShipmentStatus;
 import com.eda.shippingService.infrastructure.repo.ShipmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 public class CreateShipment {
 
     private final ShipmentRepository shipmentRepository;
+    private ModifyStockLevel modifyStockLevel;
 
     @Autowired
     public CreateShipment(ShipmentRepository shipmentRepository) {
@@ -21,6 +23,14 @@ public class CreateShipment {
             throw new IllegalArgumentException(String.format("Shipment with Order ID %s already exists.", shipment.orderId()));
         }
 
-        return shipmentRepository.save(shipment.toEntity());
+        Shipment shipmentEntity = shipment.toEntity();
+
+        if (shipmentEntity.getStatus() == ShipmentStatus.REQUESTED) {
+            modifyStockLevel.decreaseStockLevel(shipmentEntity);
+            //TODO: maybe call shipment.addPackage() (?)
+            //TODO: set the shipment status to PACKAGED (?)
+        }
+
+        return shipmentRepository.save(shipmentEntity);
     }
 }
