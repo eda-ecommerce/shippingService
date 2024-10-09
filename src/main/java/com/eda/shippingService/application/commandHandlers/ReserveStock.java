@@ -3,7 +3,7 @@ package com.eda.shippingService.application.commandHandlers;
 import com.eda.shippingService.domain.entity.OrderLineItem;
 import com.eda.shippingService.domain.entity.Product;
 import com.eda.shippingService.domain.entity.Shipment;
-import com.eda.shippingService.domain.events.StockDecreasedEvent;
+import com.eda.shippingService.domain.events.StockReservedEvent;
 import com.eda.shippingService.infrastructure.eventing.EventPublisher;
 import com.eda.shippingService.infrastructure.repo.ProductRepository;
 import org.springframework.stereotype.Component;
@@ -32,7 +32,7 @@ public class ReserveStock {
                     Product found = product.get();
                     found.reserveStock(expected.get(productId));
                     if (found.isProductInStock()) {
-                        eventPublisher.publish(new StockDecreasedEvent(UUID.randomUUID(), found));
+                        eventPublisher.publish(new StockReservedEvent(UUID.randomUUID(), found));
                         productRepository.save(found);
                         return true;
                     }
