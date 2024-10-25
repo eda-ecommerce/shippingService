@@ -2,11 +2,9 @@ package com.eda.shippingService.model;
 
 import com.eda.shippingService.domain.entity.Address;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 public class AddressTest {
     @Test
     public void shouldBeEqual() {

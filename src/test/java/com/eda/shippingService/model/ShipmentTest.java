@@ -4,14 +4,10 @@ import com.eda.shippingService.domain.entity.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 import java.util.UUID;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 public class ShipmentTest {
     private final UUID productId = UUID.fromString("1a0000-0000-0000-0000-000000000000");
     private final UUID shipmentId = UUID.fromString("1b0000-0000-0000-0000-000000000000");
