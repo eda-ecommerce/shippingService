@@ -10,11 +10,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.kafka.annotation.EnableKafka;
 
 import java.util.List;
 import java.util.UUID;
 
 @SpringBootApplication
+@EnableKafka
 @EntityScan("com.eda.shippingService.domain.entity")
 public class ShippingServiceApplication {
 
@@ -22,8 +24,8 @@ public class ShippingServiceApplication {
 		SpringApplication.run(ShippingServiceApplication.class, args);
 	}
 
-	@Bean
-	@Autowired
+	//@Bean
+	//@Autowired
 	public CommandLineRunner loadData(CreateShipment createShipment) {
 
 		return args -> {
