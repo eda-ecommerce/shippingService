@@ -3,7 +3,7 @@ package com.eda.shippingService.application.commandHandlers;
 import com.eda.shippingService.domain.entity.OrderLineItem;
 import com.eda.shippingService.domain.entity.Product;
 import com.eda.shippingService.domain.entity.Shipment;
-import com.eda.shippingService.domain.events.StockReservedEvent;
+import com.eda.shippingService.domain.events.AvailableStockAdjusted;
 import com.eda.shippingService.infrastructure.eventing.EventPublisher;
 import com.eda.shippingService.infrastructure.repo.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +15,8 @@ import java.util.UUID;
 
 @Component
 public class ReserveStock {
-    private ProductRepository productRepository;
-    private EventPublisher eventPublisher;
+    private final ProductRepository productRepository;
+    private final EventPublisher eventPublisher;
 
     @Autowired
     public ReserveStock(ProductRepository productRepository, EventPublisher eventPublisher) {
@@ -39,8 +39,7 @@ public class ReserveStock {
                     Product found = product.get();
                     found.reserveStock(expected.get(productId));
                     if (found.isProductInStock()) {
-                        eventPublisher.publish(new StockReservedEvent(UUID.randomUUID(), found),"stock");
-                        //TODO This is just "I reserved stock" but not how much.
+                        eventPublisher.publish(new AvailableStockAdjusted(UUID.randomUUID(), found),"stock");
                         productRepository.save(found);
                         return true;
                     }

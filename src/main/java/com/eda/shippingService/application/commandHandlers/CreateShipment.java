@@ -11,11 +11,12 @@ import org.springframework.stereotype.Component;
 public class CreateShipment {
 
     private final ShipmentRepository shipmentRepository;
-    private ReserveStock reserveStock;
+    private final ReserveStock reserveStock;
 
     @Autowired
-    public CreateShipment(ShipmentRepository shipmentRepository) {
+    public CreateShipment(ShipmentRepository shipmentRepository, ReserveStock reserveStock) {
         this.shipmentRepository = shipmentRepository;
+        this.reserveStock = reserveStock;
     }
 
     public Shipment handle(CreateShipmentRequestDTO shipment) {
