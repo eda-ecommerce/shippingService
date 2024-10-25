@@ -26,12 +26,12 @@ public class UpdateShipmentStatus {
             switch (request.shipmentStatus()){
                 case IN_DELIVERY -> {
                     shipment.setStatus(ShipmentStatus.IN_DELIVERY);
-                    eventPublisher.publish(new PackageSentEvent(shipment.getAPackage()));
+                    eventPublisher.publish(new PackageSentEvent(shipment.getAPackage()), "package");
                     shipmentRepository.save(shipment);
                 }
                 case DELIVERED -> {
                     shipment.delivered();
-                    eventPublisher.publish(new PackageDeliveredEvent(UUID.randomUUID(), shipment));
+                    eventPublisher.publish(new PackageDeliveredEvent(UUID.randomUUID(), shipment), "package");
                     shipmentRepository.save(shipment);
                 }
                 case RETURNED -> {

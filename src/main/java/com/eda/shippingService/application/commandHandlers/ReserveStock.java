@@ -6,6 +6,7 @@ import com.eda.shippingService.domain.entity.Shipment;
 import com.eda.shippingService.domain.events.StockReservedEvent;
 import com.eda.shippingService.infrastructure.eventing.EventPublisher;
 import com.eda.shippingService.infrastructure.repo.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -17,9 +18,15 @@ public class ReserveStock {
     private ProductRepository productRepository;
     private EventPublisher eventPublisher;
 
+    @Autowired
+    public ReserveStock(ProductRepository productRepository, EventPublisher eventPublisher) {
+        this.productRepository = productRepository;
+        this.eventPublisher = eventPublisher;
+    }
+
     // returning Boolean just in case we need it in the future
     public Boolean handle(Shipment shipment) {
-
+        //TODO: this check will always fail if we call this on an unboxed shipment.
         if (shipment.checkContents()) {
             HashMap<UUID, Integer> expected = new HashMap<>();
             for (OrderLineItem orderLineItem : shipment.getRequestedProducts()){
@@ -32,7 +39,8 @@ public class ReserveStock {
                     Product found = product.get();
                     found.reserveStock(expected.get(productId));
                     if (found.isProductInStock()) {
-                        eventPublisher.publish(new StockReservedEvent(UUID.randomUUID(), found));
+                        eventPublisher.publish(new StockReservedEvent(UUID.randomUUID(), found),"stock");
+                        //TODO This is just "I reserved stock" but not how much.
                         productRepository.save(found);
                         return true;
                     }
