@@ -7,7 +7,6 @@ import com.eda.shippingService.domain.events.StockDecreasedEvent;
 import com.eda.shippingService.domain.events.StockIncreasedEvent;
 import com.eda.shippingService.infrastructure.eventing.EventPublisher;
 import com.eda.shippingService.infrastructure.repo.ProductRepository;
-import com.eda.shippingService.infrastructure.repo.ShipmentRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -25,7 +24,7 @@ public class ModifyStockLevel {
             if (product.isPresent()){
                 Product found = product.get();
                 found.increaseStock(expected.get(productId));
-                eventPublisher.publish(new StockIncreasedEvent(UUID.randomUUID(), found));
+                eventPublisher.publish(new StockIncreasedEvent(UUID.randomUUID(), found), "stock");
                 productRepository.save(found);
             }
         }
@@ -44,7 +43,7 @@ public class ModifyStockLevel {
                 if (product.isPresent()){
                     Product found = product.get();
                     found.reduceStock(expected.get(productId));
-                    eventPublisher.publish(new StockDecreasedEvent(UUID.randomUUID(), found));
+                    eventPublisher.publish(new StockDecreasedEvent(UUID.randomUUID(), found), "stock");
                     productRepository.save(found);
                 }
             }
@@ -60,10 +59,10 @@ public class ModifyStockLevel {
                 Product found = product.get();
                 if (increaseStock) {
                     found.increaseStock(expected.get(productId));
-                    eventPublisher.publish(new StockIncreasedEvent(UUID.randomUUID(), found));
+                    eventPublisher.publish(new StockIncreasedEvent(UUID.randomUUID(), found), "stock");
                 } else {
                     found.reduceStock(expected.get(productId));
-                    eventPublisher.publish(new StockDecreasedEvent(UUID.randomUUID(), found));
+                    eventPublisher.publish(new StockDecreasedEvent(UUID.randomUUID(), found), "stock");
                 }
                 productRepository.save(found);
             }
