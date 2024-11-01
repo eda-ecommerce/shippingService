@@ -1,6 +1,7 @@
 package com.eda.shippingService.domain.dto.incoming;
 
 import com.eda.shippingService.domain.dto.outgoing.AddressDTO;
+import com.eda.shippingService.domain.dto.outgoing.OrderLineItemDTO;
 import com.eda.shippingService.domain.entity.OrderLineItem;
 import com.eda.shippingService.domain.entity.Shipment;
 import com.eda.shippingService.domain.entity.ShipmentStatus;
@@ -14,15 +15,16 @@ public record CreateShipmentRequestDTO(
         UUID customerId,
         AddressDTO destination,
         AddressDTO origin,
-        List<OrderLineItem> requestedProducts
+        List<OrderLineItemDTO> requestedProducts
 ) {
+    //This includes "logic" as in there should not be a package yet and the status is Requested, idk if thats good practice
     public Shipment toEntity(){
         return new Shipment(
-                this.destination().toEntity(),
-                this.origin().toEntity(),
-                this.orderId(),
+                orderId,
+                destination.toEntity(),
+                origin.toEntity(),
                 null,
-                this.requestedProducts(),
+                requestedProducts.stream().map(OrderLineItemDTO::toEntity).toList(),
                 ShipmentStatus.REQUESTED
         );
     }
