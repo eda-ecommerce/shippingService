@@ -12,7 +12,6 @@ public class PackageDeliveredEvent extends DomainEvent<PackageDeliveredEvent.Pac
     public PackageDeliveredEvent(UUID eventKey, Shipment payload) {
         super(eventKey, new PackageDeliveredPayload(
                 payload.getAPackage().getId(),
-                payload.getId(),
                 payload.getOrderId(),
                 AddressDTO.fromEntity(payload.getDestination()),
                 AddressDTO.fromEntity(payload.getOrigin())
@@ -21,7 +20,6 @@ public class PackageDeliveredEvent extends DomainEvent<PackageDeliveredEvent.Pac
 
     public record PackageDeliveredPayload (
             UUID packageId,
-            UUID shipmentId,
             UUID orderId,
             AddressDTO dest,
             AddressDTO origin

@@ -6,6 +6,6 @@ import com.eda.shippingService.domain.events.common.DomainEvent;
 
 public class PackageSentEvent extends DomainEvent<PackageDTO> {
     public PackageSentEvent(APackage aPackage) {
-        super(null, new PackageDTO(aPackage.getId(), aPackage.getTrackingNumber(), aPackage.getContents()));
+        super(null, PackageDTO.fromEntity(aPackage));
     }
 }
