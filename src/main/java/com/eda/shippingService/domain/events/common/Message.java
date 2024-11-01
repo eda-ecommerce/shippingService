@@ -20,5 +20,12 @@ public abstract class Message<T> {
         this.messageId = UUID.randomUUID();
         this.payload = payload;
     }
+
+    public Message(@Nullable UUID eventKey, UUID messageId, long timestamp, T payload) {
+        this.eventKey = eventKey;
+        this.timestamp = timestamp;
+        this.messageId = messageId;
+        this.payload = payload;
+    }
 }
 
