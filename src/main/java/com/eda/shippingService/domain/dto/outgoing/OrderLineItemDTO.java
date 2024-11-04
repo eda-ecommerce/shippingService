@@ -1,11 +1,20 @@
 package com.eda.shippingService.domain.dto.outgoing;
 
 import com.eda.shippingService.domain.entity.OrderLineItem;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.UUID;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonSerialize
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public record OrderLineItemDTO(
+        @JsonProperty("productId")
         UUID productId,
+        @JsonProperty("quantity")
         int quantity
 ) {
     public OrderLineItem toEntity(){
