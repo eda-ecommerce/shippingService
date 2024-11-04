@@ -44,5 +44,5 @@ error-screenshots/
 webpack.generated.js
 
 src/main/dev-bundle
-data/db.mv.db
+/data/
 /events.txt
