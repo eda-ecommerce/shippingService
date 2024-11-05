@@ -3,7 +3,7 @@ package com.eda.shippingService.domain.entity;
 import lombok.*;
 
 @AllArgsConstructor
-//Mark as value object, overrides equals/hashcode
+//Mark as value object, overrides equals/hashcode could be record?
 @Value
 @Getter
 @NoArgsConstructor(force = true)

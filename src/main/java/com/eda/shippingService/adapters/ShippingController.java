@@ -1,4 +1,4 @@
-package com.eda.shippingService.web;
+package com.eda.shippingService.adapters;
 
 import com.eda.shippingService.application.commandHandlers.*;
 import com.eda.shippingService.domain.dto.incoming.CreateShipmentRequestDTO;
