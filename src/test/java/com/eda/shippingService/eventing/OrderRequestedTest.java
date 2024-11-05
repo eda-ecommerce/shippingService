@@ -2,19 +2,24 @@ package com.eda.shippingService.eventing;
 
 
 import com.eda.shippingService.TestHelpers;
+import com.eda.shippingService.adapters.KafkaOrderListener;
 import com.eda.shippingService.application.commandHandlers.CreateShipment;
-import com.eda.shippingService.application.eventHandlers.OrderConfirmedEventHandler;
-import com.eda.shippingService.domain.dto.incoming.OrderConfirmedPayload;
+import com.eda.shippingService.application.eventHandlers.OrderRequestedEventHandler;
+import com.eda.shippingService.domain.dto.incoming.OrderRequestedPayload;
 import com.eda.shippingService.domain.dto.outgoing.ShipmentDTO;
 import com.eda.shippingService.domain.entity.*;
-import com.eda.shippingService.domain.events.OrderConfirmedEvent;
+import com.eda.shippingService.domain.events.OrderRequestedEvent;
+import com.eda.shippingService.infrastructure.eventing.KafkaEventPublisher;
 import com.eda.shippingService.infrastructure.repo.IdempotentConsumerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -29,7 +34,8 @@ import static com.eda.shippingService.TestHelpers.quickUUID;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
-public class OrderConfirmedEventTest extends KafkaTest {
+@SpringBootTest(properties = {"spring.autoconfigure.exclude="})
+public class OrderRequestedTest extends KafkaTest {
         @MockBean
         private CreateShipment createShipment;
 
@@ -37,7 +43,7 @@ public class OrderConfirmedEventTest extends KafkaTest {
         private IdempotentConsumerRepository idempotentConsumerRepository;
 
         @Autowired
-        private OrderConfirmedEventHandler orderConfirmedEventHandler;
+        private OrderRequestedEventHandler orderRequestedEventHandler;
 
         private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -50,17 +56,17 @@ public class OrderConfirmedEventTest extends KafkaTest {
                 UUID product2Id = quickUUID(4);
                 Address dest = quickAddress("street");
                 Address origin = quickAddress("street2");
-                OrderConfirmedPayload orderConfirmedPayload = new OrderConfirmedPayload(
+                OrderRequestedPayload orderRequestedPayload = new OrderRequestedPayload(
                         orderID,
                         UUID.randomUUID(),
                         "2021-09-01",
                         "CONFIRMED",
                         List.of(
-                                new OrderConfirmedPayload.Product(product1Id, 1),
-                                new OrderConfirmedPayload.Product(product2Id, 5)
+                                new OrderRequestedPayload.Product(product1Id, 1),
+                                new OrderRequestedPayload.Product(product2Id, 5)
                         )
                 );
-                OrderConfirmedEvent givenOrderConfirmedEvent = new OrderConfirmedEvent(null, messageId, System.currentTimeMillis(), orderConfirmedPayload);
+                OrderRequestedEvent givenOrderRequestedEvent = new OrderRequestedEvent(null, messageId, System.currentTimeMillis(), orderRequestedPayload);
 
                 Shipment givenShipment = new Shipment(
                         orderID,
@@ -69,9 +75,9 @@ public class OrderConfirmedEventTest extends KafkaTest {
                         null,
                         List.of(new OrderLineItem(product1Id, 1),
                                 new OrderLineItem(product2Id, 5)),
-                        ShipmentStatus.REQUESTED);
+                        ShipmentStatus.RESERVED);
                 ShipmentDTO expectedShipmentRequestedPayload = new TestHelpers
-                        .ShipmentDTOBuilder(orderID, "street", "street2", ShipmentStatus.REQUESTED)
+                        .ShipmentDTOBuilder(orderID, "street", "street2", ShipmentStatus.RESERVED)
                         .withRequestedProduct(product1Id,1)
                         .withRequestedProduct(product2Id,5)
                         .build();
@@ -82,14 +88,14 @@ public class OrderConfirmedEventTest extends KafkaTest {
 
                 //Saving is possible
                 Mockito.when(idempotentConsumerRepository.save(Mockito.any())).thenReturn(
-                        new ProcessedMessage(messageId, OrderConfirmedEventHandler.class.getSimpleName()
+                        new ProcessedMessage(messageId, OrderRequestedEventHandler.class.getSimpleName()
                         ));
 
                 //Creating a Shipment Works
                 Mockito.when(createShipment.handle(Mockito.any())).thenReturn(givenShipment);
 
                 //When
-                orderConfirmedEventHandler.handle(givenOrderConfirmedEvent);
+                orderRequestedEventHandler.handle(givenOrderRequestedEvent);
 
                 //Then
                 //The createShipment method should be called once
@@ -113,37 +119,37 @@ public class OrderConfirmedEventTest extends KafkaTest {
                 UUID product2Id = UUID.fromString("00000000-0000-0000-0000-000000000003");
                 Address address1 = new Address("street", "city", "zip", "country", "DE");
                 Address address2 = new Address("street2", "city", "zip", "country", "DE");
-                Shipment requestedShipment = new Shipment(orderID, address1, address2, null,List.of(new OrderLineItem(product1Id, 1), new OrderLineItem(product2Id, 5)), ShipmentStatus.REQUESTED);
+                Shipment requestedShipment = new Shipment(orderID, address1, address2, null,List.of(new OrderLineItem(product1Id, 1), new OrderLineItem(product2Id, 5)), ShipmentStatus.RESERVED);
 
 
-                OrderConfirmedPayload orderConfirmedPayload = new OrderConfirmedPayload(
+                OrderRequestedPayload orderRequestedPayload = new OrderRequestedPayload(
                         orderID,
                         UUID.randomUUID(),
                         "2021-09-01",
                         "CONFIRMED",
                         List.of(
-                                new OrderConfirmedPayload.Product(product1Id, 1),
-                                new OrderConfirmedPayload.Product(product2Id, 5)
+                                new OrderRequestedPayload.Product(product1Id, 1),
+                                new OrderRequestedPayload.Product(product2Id, 5)
                         )
                 );
-                OrderConfirmedEvent orderConfirmedEvent = new OrderConfirmedEvent(null, messageId, System.currentTimeMillis(), orderConfirmedPayload);
+                OrderRequestedEvent orderRequestedEvent = new OrderRequestedEvent(null, messageId, System.currentTimeMillis(), orderRequestedPayload);
 
                 //Mocks
                 //Message has already been processed
                 Mockito
                         .when(idempotentConsumerRepository.findByMessageIdAndHandlerName(Mockito.any(UUID.class), Mockito.anyString()))
-                        .thenReturn(Optional.of(new ProcessedMessage(messageId, OrderConfirmedEventHandler.class.getSimpleName())));
+                        .thenReturn(Optional.of(new ProcessedMessage(messageId, OrderRequestedEventHandler.class.getSimpleName())));
 
                 //Saving is possible
                 Mockito.when(idempotentConsumerRepository.save(Mockito.any())).thenReturn(
-                        new ProcessedMessage(messageId, OrderConfirmedEventHandler.class.getSimpleName()
+                        new ProcessedMessage(messageId, OrderRequestedEventHandler.class.getSimpleName()
                         ));
 
                 //Creating a Shipment Works
                 Mockito.when(createShipment.handle(Mockito.any())).thenReturn(requestedShipment);
 
                 //When
-                orderConfirmedEventHandler.handle(orderConfirmedEvent);
+                orderRequestedEventHandler.handle(orderRequestedEvent);
 
                 //Then
                 Mockito.verify(createShipment, Mockito.times(0)).handle(Mockito.any());

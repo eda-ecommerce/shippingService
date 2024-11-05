@@ -23,7 +23,7 @@ public class ShipmentTest {
                 origin,
                 null,
                 List.of(requested),
-                ShipmentStatus.REQUESTED
+                ShipmentStatus.RESERVED
         );
     }
 
@@ -38,7 +38,7 @@ public class ShipmentTest {
                 origin,
                 aPackage,
                 List.of(requested),
-                ShipmentStatus.REQUESTED
+                ShipmentStatus.RESERVED
         );
         Assertions.assertTrue(shipment.checkContents());
     }
@@ -53,7 +53,7 @@ public class ShipmentTest {
                 origin,
                 aPackage,
                 List.of(requested),
-                ShipmentStatus.REQUESTED
+                ShipmentStatus.RESERVED
         );
         Assertions.assertFalse(shipment.checkContents());
     }
@@ -77,7 +77,7 @@ public class ShipmentTest {
                 origin,
                 aPackage,
                 List.of(requested),
-                ShipmentStatus.REQUESTED
+                ShipmentStatus.RESERVED
         );
         shipment.assignTrackingNumber(UUID.fromString("1f0000-0000-0000-0000-000000000000"));
         Assertions.assertNotNull(shipment.getAPackage().getTrackingNumber());

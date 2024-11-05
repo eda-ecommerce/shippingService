@@ -1,11 +1,15 @@
 package com.eda.shippingService.domain.events.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import org.springframework.lang.Nullable;
 
 import java.util.UUID;
 
 @Getter
+@JsonSerialize
+@JsonIgnoreProperties
 public abstract class Message<T> {
 
     private final UUID messageId;
