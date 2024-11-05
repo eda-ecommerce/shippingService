@@ -4,6 +4,7 @@ import com.eda.shippingService.infrastructure.eventing.EventPublisher;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,9 +24,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+@Getter
 @Testcontainers
+@Slf4j(topic = "TestKafkaListener")
 @SpringBootTest
-@Slf4j(topic = "KafkaLogger")
 public abstract class KafkaTest {
 	@Container
 	static final KafkaContainer kafkaContainer = new KafkaContainer(
@@ -33,18 +35,11 @@ public abstract class KafkaTest {
 	);
 
 	// For consuming
-	@Getter
 	private ArrayList<ConsumerRecord<String, String>> consumedRecords = new ArrayList<>();
 	public final static ResettableCountDownLatch stockListenerLatch = new ResettableCountDownLatch(1);
 	public final static ResettableCountDownLatch shipmentListenerLatch = new ResettableCountDownLatch(1);
 
-	@Autowired
-	EventPublisher kafkaEventPublisher;
-
 	private static final ObjectMapper objectMapper = new ObjectMapper();
-
-	@Autowired
-	private KafkaTemplate<String, String> kafkaTemplate;
 
 	@DynamicPropertySource
 	static void kafkaProperties(DynamicPropertyRegistry registry) {
@@ -56,9 +51,6 @@ public abstract class KafkaTest {
 		stockListenerLatch.reset();
 		shipmentListenerLatch.reset();
 		consumedRecords = new ArrayList<>();
-		log.info("Resetting Latches");
-		log.info("Stock Latch hash: " + stockListenerLatch.hashCode());
-		log.info("Shipment Latch hash: " + shipmentListenerLatch.hashCode());
 	}
 
 	@BeforeAll

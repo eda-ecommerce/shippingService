@@ -1,9 +1,9 @@
 package com.eda.shippingService.eventing;
 
-import com.eda.shippingService.application.eventHandlers.OrderConfirmedEventHandler;
-import com.eda.shippingService.domain.dto.incoming.OrderConfirmedPayload;
+import com.eda.shippingService.application.eventHandlers.OrderRequestedEventHandler;
+import com.eda.shippingService.domain.dto.incoming.OrderRequestedPayload;
 import com.eda.shippingService.domain.entity.ProcessedMessage;
-import com.eda.shippingService.domain.events.OrderConfirmedEvent;
+import com.eda.shippingService.domain.events.OrderRequestedEvent;
 import com.eda.shippingService.infrastructure.repo.IdempotentConsumerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -26,21 +26,21 @@ class IdempotentConsumerRepositoryTest {
         // Arrange
         UUID messageId = UUID.fromString("00000000-0000-0000-0000-000000000001");
         UUID orderId = UUID.fromString("00000000-0000-0000-0000-000000000002");
-        OrderConfirmedPayload orderConfirmedPayload = new OrderConfirmedPayload(
+        OrderRequestedPayload orderRequestedPayload = new OrderRequestedPayload(
             orderId,
             UUID.randomUUID(),
             "2021-09-01",
             "CONFIRMED",
-            List.of(new OrderConfirmedPayload.Product(UUID.randomUUID(), 1))
+            List.of(new OrderRequestedPayload.Product(UUID.randomUUID(), 1))
         );
-        OrderConfirmedEvent event = new OrderConfirmedEvent(
-                null, messageId, System.currentTimeMillis(), orderConfirmedPayload
+        OrderRequestedEvent event = new OrderRequestedEvent(
+                null, messageId, System.currentTimeMillis(), orderRequestedPayload
         );
 
         // Act
-        idempotentConsumerRepository.save(new ProcessedMessage(event.getMessageId(), OrderConfirmedEventHandler.class.getSimpleName()));
+        idempotentConsumerRepository.save(new ProcessedMessage(event.getMessageId(), OrderRequestedEventHandler.class.getSimpleName()));
 
         // Assert
-        assertTrue(idempotentConsumerRepository.findByMessageIdAndHandlerName(event.getMessageId(), OrderConfirmedEventHandler.class.getSimpleName()).isPresent());
+        assertTrue(idempotentConsumerRepository.findByMessageIdAndHandlerName(event.getMessageId(), OrderRequestedEventHandler.class.getSimpleName()).isPresent());
     }
 }
