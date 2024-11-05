@@ -2,7 +2,6 @@ package com.eda.shippingService.domain.dto.incoming;
 
 import com.eda.shippingService.domain.dto.outgoing.AddressDTO;
 import com.eda.shippingService.domain.dto.outgoing.OrderLineItemDTO;
-import com.eda.shippingService.domain.entity.OrderLineItem;
 import com.eda.shippingService.domain.entity.Shipment;
 import com.eda.shippingService.domain.entity.ShipmentStatus;
 
@@ -25,7 +24,7 @@ public record CreateShipmentRequestDTO(
                 origin.toEntity(),
                 null,
                 requestedProducts.stream().map(OrderLineItemDTO::toEntity).toList(),
-                ShipmentStatus.REQUESTED
+                ShipmentStatus.RESERVED
         );
     }
 }
