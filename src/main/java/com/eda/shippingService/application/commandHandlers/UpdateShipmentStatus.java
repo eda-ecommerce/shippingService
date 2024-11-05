@@ -37,9 +37,7 @@ public class UpdateShipmentStatus {
                 case RETURNED -> {
                     //TODO
                 }
-                default -> {
-                    throw new IllegalArgumentException("Invalid shipment status");
-                }
+                default -> throw new IllegalArgumentException("Invalid shipment status");
             }
             shipmentRepository.save(shipment);
         }

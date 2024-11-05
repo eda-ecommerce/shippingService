@@ -2,14 +2,12 @@ package com.eda.shippingService.eventing;
 
 
 import com.eda.shippingService.TestHelpers;
-import com.eda.shippingService.adapters.KafkaOrderListener;
 import com.eda.shippingService.application.commandHandlers.CreateShipment;
 import com.eda.shippingService.application.eventHandlers.OrderRequestedEventHandler;
 import com.eda.shippingService.domain.dto.incoming.OrderRequestedPayload;
 import com.eda.shippingService.domain.dto.outgoing.ShipmentDTO;
 import com.eda.shippingService.domain.entity.*;
 import com.eda.shippingService.domain.events.OrderRequestedEvent;
-import com.eda.shippingService.infrastructure.eventing.KafkaEventPublisher;
 import com.eda.shippingService.infrastructure.repo.IdempotentConsumerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -18,8 +16,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.kafka.annotation.EnableKafka;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;

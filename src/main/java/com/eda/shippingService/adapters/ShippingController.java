@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ShippingController {
-    private CreateShipment createShipment;
-    private DeleteShipment deleteShipment;
-    private BoxShipment boxShipment;
-    private UpdateShipmentStatus updateShipmentStatus;
-    private ProcessIncomingDelivery processIncomingDelivery;
-    private SendShipment sendShipment;
+    private final CreateShipment createShipment;
+    private final DeleteShipment deleteShipment;
+    private final BoxShipment boxShipment;
+    private final UpdateShipmentStatus updateShipmentStatus;
+    private final ProcessIncomingDelivery processIncomingDelivery;
+    private final SendShipment sendShipment;
 
     @Autowired
     public ShippingController(

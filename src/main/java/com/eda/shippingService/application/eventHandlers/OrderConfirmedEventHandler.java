@@ -35,6 +35,7 @@ public class OrderConfirmedEventHandler implements EventHandler<OrderConfirmedEv
         }
         else {
             //TODO: either handle like creation, or throw exception
+            throw new RuntimeException("Shipment not found");
         }
         idempotentConsumerRepository.save(new ProcessedMessage(event.getMessageId(), this.getClass().getSimpleName()));
     }

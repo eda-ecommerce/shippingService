@@ -2,7 +2,6 @@ package com.eda.shippingService.domain.dto.outgoing;
 
 import com.eda.shippingService.domain.entity.APackage;
 import com.eda.shippingService.domain.entity.OrderLineItem;
-import com.eda.shippingService.domain.entity.PackageDimensions;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

@@ -2,7 +2,6 @@ package com.eda.shippingService.domain.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 

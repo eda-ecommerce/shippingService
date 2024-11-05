@@ -1,7 +1,6 @@
 package com.eda.shippingService.domain.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +16,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@SuppressWarnings("JpaDataSourceORMInspection")
 public class Shipment{
     //We use the orderId as the primary key, as it is unique and lets us match it to order way quicker
     @Getter
