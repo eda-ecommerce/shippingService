@@ -4,7 +4,7 @@ package com.eda.shippingService.eventing;
 import com.eda.shippingService.TestHelpers;
 import com.eda.shippingService.application.commandHandlers.CreateShipment;
 import com.eda.shippingService.application.eventHandlers.OrderRequestedEventHandler;
-import com.eda.shippingService.domain.dto.incoming.OrderRequestedPayload;
+import com.eda.shippingService.domain.dto.incoming.OrderRequestedDTO;
 import com.eda.shippingService.domain.dto.outgoing.ShipmentDTO;
 import com.eda.shippingService.domain.entity.*;
 import com.eda.shippingService.domain.events.OrderRequestedEvent;
@@ -52,17 +52,17 @@ public class OrderRequestedTest extends KafkaTest {
                 UUID product2Id = quickUUID(4);
                 Address dest = quickAddress("street");
                 Address origin = quickAddress("street2");
-                OrderRequestedPayload orderRequestedPayload = new OrderRequestedPayload(
+                OrderRequestedDTO orderRequestedDTO = new OrderRequestedDTO(
                         orderID,
                         UUID.randomUUID(),
                         "2021-09-01",
                         "CONFIRMED",
                         List.of(
-                                new OrderRequestedPayload.Product(product1Id, 1),
-                                new OrderRequestedPayload.Product(product2Id, 5)
+                                new OrderRequestedDTO.Product(product1Id, 1),
+                                new OrderRequestedDTO.Product(product2Id, 5)
                         )
                 );
-                OrderRequestedEvent givenOrderRequestedEvent = new OrderRequestedEvent(null, messageId, System.currentTimeMillis(), orderRequestedPayload);
+                OrderRequestedEvent givenOrderRequestedEvent = new OrderRequestedEvent(null, messageId, System.currentTimeMillis(), orderRequestedDTO);
 
                 Shipment givenShipment = new Shipment(
                         orderID,
@@ -118,17 +118,17 @@ public class OrderRequestedTest extends KafkaTest {
                 Shipment requestedShipment = new Shipment(orderID, address1, address2, null,List.of(new OrderLineItem(product1Id, 1), new OrderLineItem(product2Id, 5)), ShipmentStatus.RESERVED);
 
 
-                OrderRequestedPayload orderRequestedPayload = new OrderRequestedPayload(
+                OrderRequestedDTO orderRequestedDTO = new OrderRequestedDTO(
                         orderID,
                         UUID.randomUUID(),
                         "2021-09-01",
                         "CONFIRMED",
                         List.of(
-                                new OrderRequestedPayload.Product(product1Id, 1),
-                                new OrderRequestedPayload.Product(product2Id, 5)
+                                new OrderRequestedDTO.Product(product1Id, 1),
+                                new OrderRequestedDTO.Product(product2Id, 5)
                         )
                 );
-                OrderRequestedEvent orderRequestedEvent = new OrderRequestedEvent(null, messageId, System.currentTimeMillis(), orderRequestedPayload);
+                OrderRequestedEvent orderRequestedEvent = new OrderRequestedEvent(null, messageId, System.currentTimeMillis(), orderRequestedDTO);
 
                 //Mocks
                 //Message has already been processed

@@ -2,7 +2,7 @@ package com.eda.shippingService.eventing;
 
 import com.eda.shippingService.application.eventHandlers.OrderConfirmedEventHandler;
 import com.eda.shippingService.application.eventHandlers.OrderRequestedEventHandler;
-import com.eda.shippingService.domain.dto.incoming.OrderRequestedPayload;
+import com.eda.shippingService.domain.dto.incoming.OrderRequestedDTO;
 import com.eda.shippingService.domain.events.OrderRequestedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -47,13 +47,13 @@ public class KafkaOrderListenerTest extends KafkaTest {
         Thread.sleep(1000);
         //Then
         OrderRequestedEvent expected = new OrderRequestedEvent(null, quickUUID(111), 0,
-                new OrderRequestedPayload(
+                new OrderRequestedDTO(
                         quickUUID(123),
                         quickUUID(123456),
                         "20-12-24",
                         "InProcess",
                         List.of(
-                                new OrderRequestedPayload.Product(quickUUID(456), 10)
+                                new OrderRequestedDTO.Product(quickUUID(456), 10)
                         )
                 ));
         Mockito.verify(orderRequestedEventHandler).handle(requestedCaptor.capture());

@@ -1,8 +1,8 @@
 package com.eda.shippingService.adapters;
 
 import com.eda.shippingService.application.eventHandlers.EventHandler;
-import com.eda.shippingService.domain.dto.incoming.OrderConfirmedPayload;
-import com.eda.shippingService.domain.dto.incoming.OrderRequestedPayload;
+import com.eda.shippingService.domain.dto.incoming.OrderConfirmedDTO;
+import com.eda.shippingService.domain.dto.incoming.OrderRequestedDTO;
 import com.eda.shippingService.domain.events.OrderConfirmedEvent;
 import com.eda.shippingService.domain.events.OrderRequestedEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -49,11 +49,11 @@ public class KafkaOrderListener {
             switch (operation) {
                 case "OrderRequested":
                     orderRequestedEventHandler.handle(
-                            new OrderRequestedEvent(null, messageId,record.timestamp(), objectMapper.readValue(record.value(), OrderRequestedPayload.class)));
+                            new OrderRequestedEvent(null, messageId,record.timestamp(), objectMapper.readValue(record.value(), OrderRequestedDTO.class)));
                     break;
                 case "OrderConfirmed":
                     orderConfimedEventEventHandler.handle(
-                            new OrderConfirmedEvent(null, messageId, record.timestamp(), objectMapper.readValue(record.value(), OrderConfirmedPayload.class)));
+                            new OrderConfirmedEvent(null, messageId, record.timestamp(), objectMapper.readValue(record.value(), OrderConfirmedDTO.class)));
                     break;
                 default:
                     log.error("Unsupported operation: {}", operation);

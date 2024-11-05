@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record OrderRequestedPayload(
+public record OrderRequestedDTO(
         @JsonProperty("orderId") UUID orderId,
         @JsonProperty("customerId") UUID customerId,
         @JsonProperty("orderDate") String orderDate,

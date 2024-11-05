@@ -1,7 +1,7 @@
 package com.eda.shippingService.eventing;
 
 import com.eda.shippingService.application.eventHandlers.OrderRequestedEventHandler;
-import com.eda.shippingService.domain.dto.incoming.OrderRequestedPayload;
+import com.eda.shippingService.domain.dto.incoming.OrderRequestedDTO;
 import com.eda.shippingService.domain.entity.ProcessedMessage;
 import com.eda.shippingService.domain.events.OrderRequestedEvent;
 import com.eda.shippingService.infrastructure.repo.IdempotentConsumerRepository;
@@ -26,15 +26,15 @@ class IdempotentConsumerRepositoryTest {
         // Arrange
         UUID messageId = UUID.fromString("00000000-0000-0000-0000-000000000001");
         UUID orderId = UUID.fromString("00000000-0000-0000-0000-000000000002");
-        OrderRequestedPayload orderRequestedPayload = new OrderRequestedPayload(
+        OrderRequestedDTO orderRequestedDTO = new OrderRequestedDTO(
             orderId,
             UUID.randomUUID(),
             "2021-09-01",
             "CONFIRMED",
-            List.of(new OrderRequestedPayload.Product(UUID.randomUUID(), 1))
+            List.of(new OrderRequestedDTO.Product(UUID.randomUUID(), 1))
         );
         OrderRequestedEvent event = new OrderRequestedEvent(
-                null, messageId, System.currentTimeMillis(), orderRequestedPayload
+                null, messageId, System.currentTimeMillis(), orderRequestedDTO
         );
 
         // Act

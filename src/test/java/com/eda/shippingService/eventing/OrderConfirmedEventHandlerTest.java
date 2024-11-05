@@ -1,7 +1,7 @@
 package com.eda.shippingService.eventing;
 
 import com.eda.shippingService.application.eventHandlers.OrderConfirmedEventHandler;
-import com.eda.shippingService.domain.dto.incoming.OrderConfirmedPayload;
+import com.eda.shippingService.domain.dto.incoming.OrderConfirmedDTO;
 import com.eda.shippingService.domain.entity.OrderLineItem;
 import com.eda.shippingService.domain.entity.ProcessedMessage;
 import com.eda.shippingService.domain.entity.Shipment;
@@ -47,8 +47,8 @@ public class OrderConfirmedEventHandlerTest {
                 ShipmentStatus.RESERVED
         );
         OrderConfirmedEvent orderConfirmedEvent = new OrderConfirmedEvent(null, quickUUID(3), System.currentTimeMillis(),
-                new OrderConfirmedPayload(quickUUID(1), quickUUID(99), "23-12-2021", "READY_FOR_SHIPMENT", List.of(
-                        new OrderConfirmedPayload.Product(quickUUID(2), 1)
+                new OrderConfirmedDTO(quickUUID(1), quickUUID(99), "23-12-2021", "READY_FOR_SHIPMENT", List.of(
+                        new OrderConfirmedDTO.Product(quickUUID(2), 1)
                 )
                 ));
         //Mocks
