@@ -6,12 +6,9 @@ import com.eda.shippingService.domain.entity.ProcessedMessage;
 import com.eda.shippingService.domain.events.OrderConfirmedEvent;
 import com.eda.shippingService.infrastructure.repo.IdempotentConsumerRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,14 +16,13 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
-@ActiveProfiles("unit-test")
 @Slf4j
-public class IdempotentConsumerRepositoryTest {
+class IdempotentConsumerRepositoryTest {
     @Autowired
     private IdempotentConsumerRepository idempotentConsumerRepository;
 
-    //@Test
-    public void shouldFindEntry() {
+    @Test
+    void shouldFindEntry() {
         // Arrange
         UUID messageId = UUID.fromString("00000000-0000-0000-0000-000000000001");
         UUID orderId = UUID.fromString("00000000-0000-0000-0000-000000000002");
