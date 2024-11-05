@@ -1,5 +1,6 @@
 package com.eda.shippingService.domain.entity;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @AllArgsConstructor
@@ -16,7 +17,7 @@ public class Address {
 
     //You would use some Validation framework here
     public boolean validate(){
-        return country.equals("DE");
+        return country != null && country.equals("DE");
     }
 
     @Override

@@ -27,14 +27,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 public class KafkaOrderListenerTest extends KafkaTest {
-    @Autowired
-    private KafkaOrderListener kafkaOrderListener;
-
     @MockBean
     private OrderConfirmedEventHandler orderConfirmedEventHandler;
     @MockBean
     private OrderRequestedEventHandler orderRequestedEventHandler;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private KafkaTemplate<String,String > kafkaTemplate;
@@ -43,7 +39,6 @@ public class KafkaOrderListenerTest extends KafkaTest {
     void shouldCallOrderConfirmedWithValidEvent() throws IOException, InterruptedException {
         Mockito.doNothing().when(orderConfirmedEventHandler).handle(Mockito.any());
         Mockito.doNothing().when(orderRequestedEventHandler).handle(Mockito.any());
-        ArgumentCaptor<OrderConfirmedEvent> confirmedCaptor = ArgumentCaptor.forClass(OrderConfirmedEvent.class);
         ArgumentCaptor<OrderRequestedEvent> requestedCaptor = ArgumentCaptor.forClass(OrderRequestedEvent.class);
         String orderRequestedPayload = FileUtils.readFileToString(new File("src/test/java/com/eda/shippingService/eventing/data/requested.json"), StandardCharsets.UTF_8);
         log.info("Payload: {}", orderRequestedPayload);
