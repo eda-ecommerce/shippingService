@@ -85,9 +85,9 @@ public class TestHelpers {
                         new AddressDTO("street2", "city", "state", "postalCode", "DE"),
                         new PackageDTO(quickUUID(999), quickUUID(3), new PackageDTO.PackageDimensions(1f,1f,1f,1f),1f, List.of(new OrderLineItemDTO(quickUUID(3), 1))),
                         List.of(new OrderLineItemDTO(quickUUID(3), 1)),
-                        ShipmentStatus.REQUESTED
+                        ShipmentStatus.RESERVED
                 );
-        ShipmentDTO actual = new ShipmentDTOBuilder(quickUUID(1), "street", "street2", ShipmentStatus.REQUESTED)
+        ShipmentDTO actual = new ShipmentDTOBuilder(quickUUID(1), "street", "street2", ShipmentStatus.RESERVED)
                 .withRequestedProduct(quickUUID(3), 1)
                 .withPackageContents(quickUUID(999), quickUUID(3), List.of(new OrderLineItemDTO(quickUUID(3), 1)))
                 .build();

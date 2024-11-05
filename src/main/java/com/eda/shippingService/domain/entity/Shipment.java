@@ -1,6 +1,8 @@
 package com.eda.shippingService.domain.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +35,7 @@ public class Shipment{
                     @AttributeOverride(name = "country", column = @Column(name = "destination_country"))
             }
     )
+    @NotNull
     private Address destination;
     @Embedded
     @AttributeOverrides(
@@ -44,6 +47,7 @@ public class Shipment{
                     @AttributeOverride(name = "country", column = @Column(name = "origin_country"))
             }
     )
+    @NotNull
     private Address origin;
 
     //At the moment we assume one package per shipment, but this could easily be changed to a list of packages
@@ -98,6 +102,21 @@ public class Shipment{
             }
         }
         return true;
+    }
+
+    public void approve(){
+        if (this.status == ShipmentStatus.RESERVED || this.status == null){
+            this.status = ShipmentStatus.APPROVED;
+        } else {
+            throw new IllegalStateException("Shipment is way past the point of no return");
+        }
+    }
+
+    public void pack(){
+        if (this.status != ShipmentStatus.APPROVED){
+            throw new IllegalStateException("Shipment must be approved before it can be packed");
+        }
+
     }
 
     public void send(){

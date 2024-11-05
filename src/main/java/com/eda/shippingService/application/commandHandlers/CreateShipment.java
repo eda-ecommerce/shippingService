@@ -28,7 +28,7 @@ public class CreateShipment {
         }
         Shipment shipmentEntity = shipmentDTO.toEntity();
 
-        if (shipmentEntity.getStatus() == ShipmentStatus.REQUESTED) {
+        if (shipmentEntity.getStatus() == ShipmentStatus.RESERVED) {
             // instead of directly decreasing the stock here, we are just reserving the necessary stock amount
             // the stock will be decreased only when the shipment is boxed.
             reserveStock.handle(shipmentEntity);
