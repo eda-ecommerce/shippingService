@@ -1,9 +1,6 @@
 package com.eda.shippingService.application.service;
 
-import com.eda.shippingService.domain.entity.OrderLineItem;
 import com.eda.shippingService.domain.entity.Product;
-import com.eda.shippingService.domain.entity.Shipment;
-import com.eda.shippingService.domain.entity.ShipmentStatus;
 import com.eda.shippingService.domain.events.AvailableStockAdjusted;
 import com.eda.shippingService.infrastructure.eventing.EventPublisher;
 import com.eda.shippingService.infrastructure.repo.ProductRepository;
