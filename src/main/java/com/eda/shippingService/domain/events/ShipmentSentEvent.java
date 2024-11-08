@@ -1,0 +1,29 @@
+package com.eda.shippingService.domain.events;
+
+import com.eda.shippingService.domain.dto.outgoing.AddressDTO;
+import com.eda.shippingService.domain.dto.outgoing.PackageDTO;
+import com.eda.shippingService.domain.entity.Shipment;
+import com.eda.shippingService.domain.entity.ShipmentStatus;
+import com.eda.shippingService.domain.events.common.DomainEvent;
+
+import java.util.UUID;
+
+public class ShipmentSentEvent extends DomainEvent<ShipmentSentEvent.ShipmentSentPayload> {
+    public ShipmentSentEvent(UUID eventKey, Shipment payload) {
+        super(eventKey, new ShipmentSentPayload(
+                payload.getOrderId(),
+                PackageDTO.fromEntity(payload.getAPackage()),
+                AddressDTO.fromEntity(payload.getDestination()),
+                AddressDTO.fromEntity(payload.getOrigin()),
+                payload.getStatus()
+        ));
+    }
+
+    public record ShipmentSentPayload(
+            UUID orderId,
+            PackageDTO packageDTO,
+            AddressDTO dest,
+            AddressDTO origin,
+            ShipmentStatus status
+    ){}
+}
