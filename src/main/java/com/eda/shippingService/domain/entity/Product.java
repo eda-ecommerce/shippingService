@@ -54,6 +54,10 @@ public class Product extends AbstractEntity{
         return this.stock.intValue() - this.reservedStock.intValue();
     }
 
+    public boolean isCritical() {
+        return this.getAvailableStock() <= 5;
+    }
+
     public void retire() {
         this.retired = true;
     }

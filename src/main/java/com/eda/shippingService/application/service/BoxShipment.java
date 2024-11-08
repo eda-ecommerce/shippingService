@@ -3,6 +3,7 @@ package com.eda.shippingService.application.service;
 import com.eda.shippingService.domain.entity.*;
 import com.eda.shippingService.domain.events.AvailableStockAdjusted;
 import com.eda.shippingService.domain.events.ShipmentBoxedEvent;
+import com.eda.shippingService.domain.events.StockCriticalEvent;
 import com.eda.shippingService.infrastructure.eventing.EventPublisher;
 import com.eda.shippingService.infrastructure.repo.ProductRepository;
 import com.eda.shippingService.infrastructure.repo.ShipmentRepository;
@@ -22,7 +23,11 @@ public class BoxShipment {
     private final ProductRepository productRepository;
 
     @Autowired
-    public BoxShipment(ShipmentRepository shipmentRepository, EventPublisher eventPublisher, ProductRepository productRepository) {
+    public BoxShipment(
+            ShipmentRepository shipmentRepository,
+            EventPublisher eventPublisher,
+            ProductRepository productRepository
+    ) {
         this.shipmentRepository = shipmentRepository;
         this.eventPublisher = eventPublisher;
         this.productRepository = productRepository;
@@ -30,37 +35,34 @@ public class BoxShipment {
 
     public void handle(Shipment incomingShipment, APackage packageDetails) {
 
-        Optional<Shipment> found = shipmentRepository.findById(incomingShipment.getOrderId());
-
-        if (packageDetails != null) {
+        if (packageDetails == null) {
+            throw new IllegalArgumentException("Package details not found.");
+        }
+        else {
+            Optional<Shipment> found = shipmentRepository.findById(incomingShipment.getOrderId());
             if (found.isPresent()) {
                 Shipment shipment = found.get();
-                if (shipment.getStatus() == null) {
-                    throw new IllegalArgumentException("Shipment has not been reserved yet");
+                ShipmentStatus shipmentStatus = shipment.getStatus();
+                if (shipmentStatus != ShipmentStatus.RESERVED) {
+                    throw new IllegalArgumentException("Shipment status is " + shipmentStatus + " and not RESERVED.");
                 }
-                else if (shipment.getStatus() == ShipmentStatus.RESERVED) {
-                    // TODO: unreserve the stock and send out an event in case of critical stock levels
-                    HashMap<UUID, Integer> expected = new HashMap<>();
-                    for (OrderLineItem orderLineItem : shipment.getRequestedProducts()){
-                        expected.put(orderLineItem.getProductId(), orderLineItem.getQuantity());
-                    }
-
-                    // if this flag is true after un-reserving all the products, pack the shipment
-                    boolean stockAdjusted = true;
-
+                else {
+                    HashMap<UUID, Integer> expected = shipment.getRequestedProductsAsHashMap();
                     for (UUID productId : expected.keySet()){
                         Optional<Product> product = productRepository.findById(productId);
                         if (product.isPresent()){
                             Product foundProduct = product.get();
                             double reservedStock = foundProduct.getReservedStock().doubleValue();
-                            if (reservedStock > 0){
+                            if (reservedStock > 0){ // maybe unnecessary check? remove if not needed.
                                 foundProduct.unreserveStock(reservedStock);
                                 foundProduct.reduceStock(reservedStock);
                                 eventPublisher.publish(new AvailableStockAdjusted(UUID.randomUUID(), foundProduct),"stock");
                                 productRepository.save(foundProduct);
+                                if (foundProduct.isCritical()){
+                                    eventPublisher.publish(new StockCriticalEvent(UUID.randomUUID(), foundProduct),"stock");
+                                }
                             }
                             else {
-                                stockAdjusted = false;
                                 throw new IllegalArgumentException(String.format("The reserved stock level is %s, so it is not possible to un-reserve it.", reservedStock));
                             }
                         }
@@ -72,16 +74,10 @@ public class BoxShipment {
                     eventPublisher.publish(new ShipmentBoxedEvent(UUID.randomUUID(), shipment), "shipment");
                     shipmentRepository.save(shipment);
                 }
-                else {
-                    throw new IllegalArgumentException("Shipment has either been boxed, or sent for delivery.");
-                }
             }
             else {
-                throw new IllegalArgumentException("Shipment not found");
+                throw new IllegalArgumentException("Shipment not found.");
             }
-        }
-        else {
-            throw new IllegalArgumentException("Package details not found");
         }
     }
 }
