@@ -5,9 +5,9 @@ import com.eda.shippingService.domain.events.common.DomainEvent;
 
 import java.util.UUID;
 
-public class AvailableStockAdjusted extends DomainEvent<AvailableStockAdjusted.StockReservedPayload> {
+public class AvailableStockAdjusted extends DomainEvent<AvailableStockAdjusted.StockAdjustedPayload> {
     public AvailableStockAdjusted(UUID eventKey, Product payload) {
-        super(eventKey, new StockReservedPayload(
+        super(eventKey, new StockAdjustedPayload(
                 payload.getId(),
                 payload.getStock(),
                 payload.getReservedStock(),
@@ -15,7 +15,7 @@ public class AvailableStockAdjusted extends DomainEvent<AvailableStockAdjusted.S
         ));
     }
 
-    public record StockReservedPayload(
+    public record StockAdjustedPayload(
             UUID productId,
             Number actualStock,
             Number reservedStock,
