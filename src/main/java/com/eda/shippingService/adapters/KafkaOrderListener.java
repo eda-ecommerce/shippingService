@@ -47,11 +47,11 @@ public class KafkaOrderListener {
                 .orElseThrow());
         try {
             switch (operation) {
-                case "OrderRequested":
+                case "requested":
                     orderRequestedEventHandler.handle(
                             new OrderRequestedEvent(null, messageId,record.timestamp(), objectMapper.readValue(record.value(), OrderRequestedDTO.class)));
                     break;
-                case "OrderConfirmed":
+                case "confirmed":
                     orderConfimedEventEventHandler.handle(
                             new OrderConfirmedEvent(null, messageId, record.timestamp(), objectMapper.readValue(record.value(), OrderConfirmedDTO.class)));
                     break;

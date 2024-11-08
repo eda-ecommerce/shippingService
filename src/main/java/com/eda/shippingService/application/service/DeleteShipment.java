@@ -1,4 +1,4 @@
-package com.eda.shippingService.application.commandHandlers;
+package com.eda.shippingService.application.service;
 
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;

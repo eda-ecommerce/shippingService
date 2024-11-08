@@ -1,4 +1,4 @@
-package com.eda.shippingService.application.commandHandlers;
+package com.eda.shippingService.application.service;
 
 import com.eda.shippingService.domain.entity.Shipment;
 import com.eda.shippingService.domain.entity.ShipmentStatus;

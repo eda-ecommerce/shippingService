@@ -1,6 +1,6 @@
 package com.eda.shippingService;
 
-import com.eda.shippingService.application.commandHandlers.CreateShipment;
+import com.eda.shippingService.application.service.CreateShipment;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

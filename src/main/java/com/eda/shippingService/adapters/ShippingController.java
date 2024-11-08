@@ -1,6 +1,6 @@
 package com.eda.shippingService.adapters;
 
-import com.eda.shippingService.application.commandHandlers.*;
+import com.eda.shippingService.application.service.*;
 import com.eda.shippingService.domain.dto.incoming.CreateShipmentRequestDTO;
 import com.eda.shippingService.domain.dto.incoming.IncomingDeliveryDTO;
 import com.eda.shippingService.domain.dto.incoming.UpdateShipmentStatusRequestDTO;
@@ -43,6 +43,7 @@ public class ShippingController {
     @PostMapping("/shipment/status")
     public void setStatus(@RequestBody UpdateShipmentStatusRequestDTO shipmentDTO) {
         updateShipmentStatus.handle(shipmentDTO);
+        //updateShipmentStatus.handle();
     }
     /*
     Routes:

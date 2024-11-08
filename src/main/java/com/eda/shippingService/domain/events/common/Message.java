@@ -11,7 +11,6 @@ import java.util.UUID;
 @JsonSerialize
 @JsonIgnoreProperties
 public abstract class Message<T> {
-
     private final UUID messageId;
     @Nullable
     private final UUID eventKey;

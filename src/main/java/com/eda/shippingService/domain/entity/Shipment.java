@@ -134,8 +134,8 @@ public class Shipment{
     }
 
     public void reserve(){
-        if (this.status != null){
-            throw new IllegalStateException("Shipment cannot be reserved again");
+        if (this.status != ShipmentStatus.REQUESTED){
+            throw new IllegalStateException("Shipment cannot be reserved again. Current status: " + this.status);
         }
         this.status = ShipmentStatus.RESERVED;
     }

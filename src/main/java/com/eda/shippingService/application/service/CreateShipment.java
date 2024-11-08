@@ -1,4 +1,4 @@
-package com.eda.shippingService.application.commandHandlers;
+package com.eda.shippingService.application.service;
 
 import com.eda.shippingService.domain.dto.incoming.CreateShipmentRequestDTO;
 import com.eda.shippingService.domain.entity.Shipment;
@@ -13,12 +13,10 @@ import org.springframework.stereotype.Component;
 public class CreateShipment {
 
     private final ShipmentRepository shipmentRepository;
-    private final ReserveStock reserveStock;
 
     @Autowired
     public CreateShipment(ShipmentRepository shipmentRepository, ReserveStock reserveStock) {
         this.shipmentRepository = shipmentRepository;
-        this.reserveStock = reserveStock;
     }
 
     public Shipment handle(CreateShipmentRequestDTO shipmentDTO) {
@@ -26,13 +24,6 @@ public class CreateShipment {
             throw new IllegalArgumentException(String.format("Shipment with Order ID %s already exists.", shipmentDTO.orderId()));
         }
         Shipment shipmentEntity = shipmentDTO.toEntity();
-
-        if (shipmentEntity.getStatus() == null) {
-            // instead of directly decreasing the stock here, we are just reserving the necessary stock amount
-            // the stock will be decreased only when the shipment is boxed.
-            reserveStock.handle(shipmentEntity);
-        }
-
         return shipmentRepository.save(shipmentEntity);
     }
 }

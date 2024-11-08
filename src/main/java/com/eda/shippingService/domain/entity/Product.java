@@ -46,7 +46,13 @@ public class Product extends AbstractEntity{
         this.reservedStock = this.reservedStock.doubleValue() - amount.doubleValue();
     }
 
-    public boolean isProductInStock() { return this.stock.doubleValue() - this.reservedStock.doubleValue() > 0; }
+    public boolean isQuantityAvailable(Integer amount) {
+        return this.stock.doubleValue() - (this.reservedStock.doubleValue() + amount) > 0;
+    }
+
+    public Integer getAvailableStock() {
+        return (int) (this.stock.intValue() - this.reservedStock.intValue());
+    }
 
     public void retire() {
         this.retired = true;

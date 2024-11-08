@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonSerialize
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public enum ShipmentStatus {
+    REQUESTED,
     RESERVED,
     APPROVED,
     PACKAGED,

@@ -2,7 +2,7 @@ package com.eda.shippingService.eventing;
 
 
 import com.eda.shippingService.TestHelpers;
-import com.eda.shippingService.application.commandHandlers.CreateShipment;
+import com.eda.shippingService.application.service.CreateShipment;
 import com.eda.shippingService.application.eventHandlers.OrderRequestedEventHandler;
 import com.eda.shippingService.domain.dto.incoming.OrderRequestedDTO;
 import com.eda.shippingService.domain.dto.outgoing.ShipmentDTO;
