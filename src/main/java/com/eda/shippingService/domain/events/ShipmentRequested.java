@@ -5,8 +5,8 @@ import com.eda.shippingService.domain.events.common.DomainEvent;
 
 import java.util.UUID;
 
-public class ShipmentRequestedEvent extends DomainEvent<ShipmentDTO> {
-    public ShipmentRequestedEvent(UUID eventKey, ShipmentDTO payload) {
+public class ShipmentRequested extends DomainEvent<ShipmentDTO> {
+    public ShipmentRequested(UUID eventKey, ShipmentDTO payload) {
         super(eventKey, payload);
     }
 }

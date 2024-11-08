@@ -7,7 +7,7 @@ import com.eda.shippingService.application.eventHandlers.OrderRequestedEventHand
 import com.eda.shippingService.domain.dto.incoming.OrderRequestedDTO;
 import com.eda.shippingService.domain.dto.outgoing.ShipmentDTO;
 import com.eda.shippingService.domain.entity.*;
-import com.eda.shippingService.domain.events.OrderRequestedEvent;
+import com.eda.shippingService.domain.events.OrderRequested;
 import com.eda.shippingService.infrastructure.repo.IdempotentConsumerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -62,7 +62,7 @@ public class OrderRequestedTest extends KafkaTest {
                                 new OrderRequestedDTO.Product(product2Id, 5)
                         )
                 );
-                OrderRequestedEvent givenOrderRequestedEvent = new OrderRequestedEvent(null, messageId, System.currentTimeMillis(), orderRequestedDTO);
+                OrderRequested givenOrderRequested = new OrderRequested(null, messageId, System.currentTimeMillis(), orderRequestedDTO);
 
                 Shipment givenShipment = new Shipment(
                         orderID,
@@ -91,7 +91,7 @@ public class OrderRequestedTest extends KafkaTest {
                 Mockito.when(createShipment.handle(Mockito.any())).thenReturn(givenShipment);
 
                 //When
-                orderRequestedEventHandler.handle(givenOrderRequestedEvent);
+                orderRequestedEventHandler.handle(givenOrderRequested);
 
                 //Then
                 //The createShipment method should be called once
@@ -128,7 +128,7 @@ public class OrderRequestedTest extends KafkaTest {
                                 new OrderRequestedDTO.Product(product2Id, 5)
                         )
                 );
-                OrderRequestedEvent orderRequestedEvent = new OrderRequestedEvent(null, messageId, System.currentTimeMillis(), orderRequestedDTO);
+                OrderRequested orderRequested = new OrderRequested(null, messageId, System.currentTimeMillis(), orderRequestedDTO);
 
                 //Mocks
                 //Message has already been processed
@@ -145,7 +145,7 @@ public class OrderRequestedTest extends KafkaTest {
                 Mockito.when(createShipment.handle(Mockito.any())).thenReturn(requestedShipment);
 
                 //When
-                orderRequestedEventHandler.handle(orderRequestedEvent);
+                orderRequestedEventHandler.handle(orderRequested);
 
                 //Then
                 Mockito.verify(createShipment, Mockito.times(0)).handle(Mockito.any());

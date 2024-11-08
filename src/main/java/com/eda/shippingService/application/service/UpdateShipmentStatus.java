@@ -3,7 +3,7 @@ package com.eda.shippingService.application.service;
 import com.eda.shippingService.domain.dto.incoming.UpdateShipmentStatusRequestDTO;
 import com.eda.shippingService.domain.events.PackageSentEvent;
 import com.eda.shippingService.infrastructure.eventing.EventPublisher;
-import com.eda.shippingService.domain.events.PackageDeliveredEvent;
+import com.eda.shippingService.domain.events.ShipmentDelivered;
 import com.eda.shippingService.infrastructure.repo.ShipmentRepository;
 import com.eda.shippingService.domain.dto.outgoing.ShipmentDTO;
 import com.eda.shippingService.domain.entity.Shipment;
@@ -31,7 +31,7 @@ public class UpdateShipmentStatus {
                 }
                 case DELIVERED -> {
                     shipment.delivered();
-                    eventPublisher.publish(new PackageDeliveredEvent(UUID.randomUUID(), shipment), "package");
+                    eventPublisher.publish(new ShipmentDelivered(UUID.randomUUID(), shipment), "package");
                     shipmentRepository.save(shipment);
                 }
                 case RETURNED -> {

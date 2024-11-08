@@ -3,7 +3,7 @@ package com.eda.shippingService.eventing;
 import com.eda.shippingService.application.eventHandlers.OrderRequestedEventHandler;
 import com.eda.shippingService.domain.dto.incoming.OrderRequestedDTO;
 import com.eda.shippingService.domain.entity.ProcessedMessage;
-import com.eda.shippingService.domain.events.OrderRequestedEvent;
+import com.eda.shippingService.domain.events.OrderRequested;
 import com.eda.shippingService.infrastructure.repo.IdempotentConsumerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ class IdempotentConsumerRepositoryTest {
             "CONFIRMED",
             List.of(new OrderRequestedDTO.Product(UUID.randomUUID(), 1))
         );
-        OrderRequestedEvent event = new OrderRequestedEvent(
+        OrderRequested event = new OrderRequested(
                 null, messageId, System.currentTimeMillis(), orderRequestedDTO
         );
 

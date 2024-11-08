@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 //Should be like OrderCreatedEvent
-public record CreateShipmentRequestDTO(
+public record RequestShipmentDTO(
         UUID orderId,
         UUID customerId,
         AddressDTO destination,

@@ -1,14 +1,10 @@
 package com.eda.shippingService.application.eventHandlers;
 
-import com.eda.shippingService.application.service.CreateShipment;
-import com.eda.shippingService.application.service.ReserveStock;
-import com.eda.shippingService.domain.dto.incoming.CreateShipmentRequestDTO;
+import com.eda.shippingService.application.service.ShipmentService;
+import com.eda.shippingService.application.service.StockService;
+import com.eda.shippingService.domain.dto.incoming.RequestShipmentDTO;
 import com.eda.shippingService.domain.dto.outgoing.OrderLineItemDTO;
-import com.eda.shippingService.domain.dto.outgoing.ShipmentDTO;
-import com.eda.shippingService.domain.entity.Shipment;
-import com.eda.shippingService.domain.events.OrderRequestedEvent;
-import com.eda.shippingService.domain.entity.ProcessedMessage;
-import com.eda.shippingService.domain.events.ShipmentRequestedEvent;
+import com.eda.shippingService.domain.events.OrderRequested;
 import com.eda.shippingService.infrastructure.eventing.EventPublisher;
 import com.eda.shippingService.infrastructure.repo.IdempotentConsumerRepository;
 import jakarta.transaction.Transactional;
@@ -18,22 +14,22 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class OrderRequestedEventHandler implements EventHandler<OrderRequestedEvent> {
+public class OrderRequestedEventHandler implements EventHandler<OrderRequested> {
     private final IdempotentConsumerRepository idempotentConsumerRepository;
-    private final CreateShipment createShipmentHandler;
-    private final ReserveStock reserveStock;
+    private final ShipmentService shipmentService;
     private final EventPublisher eventPublisher;
+    private final StockService stockservice;
 
     @Autowired
-    public OrderRequestedEventHandler(IdempotentConsumerRepository idempotentConsumerRepository, CreateShipment createShipmentHandler, ReserveStock reserveStock, EventPublisher eventPublisher) {
+    public OrderRequestedEventHandler(IdempotentConsumerRepository idempotentConsumerRepository, ShipmentService shipmentService, EventPublisher eventPublisher, StockService stockservice) {
         this.idempotentConsumerRepository = idempotentConsumerRepository;
-        this.createShipmentHandler = createShipmentHandler;
-        this.reserveStock = reserveStock;
+        this.shipmentService = shipmentService;
         this.eventPublisher = eventPublisher;
+        this.stockservice = stockservice;
     }
 
     @Transactional
-    public void handle(OrderRequestedEvent event) {
+    public void handle(OrderRequested event) {
         log.info("Handling OrderConfirmedEvent with ID: {}", event.getMessageId());
         if (idempotentConsumerRepository.findByMessageIdAndHandlerName(event.getMessageId(), this.getClass().getSimpleName()).isPresent()) {
             log.info("OrderConfirmedEvent with ID: {} already processed", event.getMessageId());
@@ -41,15 +37,13 @@ public class OrderRequestedEventHandler implements EventHandler<OrderRequestedEv
         }
         // Transforming this from event to DTO seems counterintuitive,
         // should the handler support taking events directly?
-        Shipment created = createShipmentHandler.handle(new CreateShipmentRequestDTO(
+        var created = shipmentService.requestShipment(new RequestShipmentDTO(
                 event.getPayload().orderId(),
                 event.getPayload().customerId(),
+                //TODO Where do the addresses come from?
                 null,null,
                 event.getPayload().products().stream().map(product -> new OrderLineItemDTO(product.productId(), product.quantity())).toList()));
+        var requestedProducts = created.getRequestedProducts();
 
-        idempotentConsumerRepository.save(new ProcessedMessage(event.getMessageId(), this.getClass().getSimpleName()));
-
-        ShipmentDTO shipmentDTO = ShipmentDTO.fromEntity(created);
-        eventPublisher.publish(new ShipmentRequestedEvent (null, shipmentDTO), "shipment");
     }
 }

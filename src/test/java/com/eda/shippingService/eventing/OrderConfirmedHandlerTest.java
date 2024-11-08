@@ -6,7 +6,7 @@ import com.eda.shippingService.domain.entity.OrderLineItem;
 import com.eda.shippingService.domain.entity.ProcessedMessage;
 import com.eda.shippingService.domain.entity.Shipment;
 import com.eda.shippingService.domain.entity.ShipmentStatus;
-import com.eda.shippingService.domain.events.OrderConfirmedEvent;
+import com.eda.shippingService.domain.events.OrderConfirmed;
 import com.eda.shippingService.infrastructure.repo.IdempotentConsumerRepository;
 import com.eda.shippingService.infrastructure.repo.ShipmentRepository;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import static com.eda.shippingService.TestHelpers.quickUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(classes = {OrderConfirmedEventHandler.class})
-public class OrderConfirmedEventHandlerTest {
+public class OrderConfirmedHandlerTest {
     @Autowired
     private OrderConfirmedEventHandler orderConfirmedEventHandler;
 
@@ -46,7 +46,7 @@ public class OrderConfirmedEventHandlerTest {
                 ),
                 ShipmentStatus.RESERVED
         );
-        OrderConfirmedEvent orderConfirmedEvent = new OrderConfirmedEvent(null, quickUUID(3), System.currentTimeMillis(),
+        OrderConfirmed orderConfirmedEvent = new OrderConfirmed(null, quickUUID(3), System.currentTimeMillis(),
                 new OrderConfirmedDTO(quickUUID(1), quickUUID(99), "23-12-2021", "READY_FOR_SHIPMENT", List.of(
                         new OrderConfirmedDTO.Product(quickUUID(2), 1)
                 )

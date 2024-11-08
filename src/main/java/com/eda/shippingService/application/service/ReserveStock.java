@@ -29,9 +29,11 @@ public class ReserveStock {
                 Product found = product.get();
                 Integer expectedAmount = expected.get(productId);
                 if (found.isQuantityAvailable(expectedAmount)) {
-                    eventPublisher.publish(new AvailableStockAdjusted(UUID.randomUUID(), found), "stock");
                     found.reserveStock(expectedAmount);
                     productRepository.save(found);
+                    eventPublisher.publish(new AvailableStockAdjusted(UUID.randomUUID(), new AvailableStockAdjusted.StockAdjustedPayload(
+                            found.getId(), found.getStock(), found.getReservedStock(), found.getAvailableStock()
+                    )), "stock");
                 } else {
                     throw new IllegalArgumentException(String.format("The Product's stock is %s. Cannot reserve %s.", found.getStock(), expectedAmount));
                 }

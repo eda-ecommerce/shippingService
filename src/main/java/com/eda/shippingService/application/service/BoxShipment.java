@@ -1,8 +1,11 @@
 package com.eda.shippingService.application.service;
 
+import com.eda.shippingService.domain.entity.APackage;
+import com.eda.shippingService.domain.entity.Shipment;
+import com.eda.shippingService.domain.entity.ShipmentStatus;
+import com.eda.shippingService.domain.events.ShipmentBoxed;
 import com.eda.shippingService.domain.entity.*;
 import com.eda.shippingService.domain.events.AvailableStockAdjusted;
-import com.eda.shippingService.domain.events.ShipmentBoxedEvent;
 import com.eda.shippingService.domain.events.StockCriticalEvent;
 import com.eda.shippingService.infrastructure.eventing.EventPublisher;
 import com.eda.shippingService.infrastructure.repo.ProductRepository;
@@ -56,7 +59,12 @@ public class BoxShipment {
                             if (reservedStock > 0){ // maybe unnecessary check? remove if not needed.
                                 foundProduct.unreserveStock(reservedStock);
                                 foundProduct.reduceStock(reservedStock);
-                                eventPublisher.publish(new AvailableStockAdjusted(UUID.randomUUID(), foundProduct),"stock");
+                                eventPublisher.publish(new AvailableStockAdjusted(UUID.randomUUID(),
+                                        new AvailableStockAdjusted.StockAdjustedPayload(
+                                                foundProduct.getId(),
+                                                foundProduct.getStock(),
+                                                foundProduct.getReservedStock(),
+                                                foundProduct.getAvailableStock())),"stock");
                                 productRepository.save(foundProduct);
                                 if (foundProduct.isCritical()){
                                     eventPublisher.publish(new StockCriticalEvent(UUID.randomUUID(), foundProduct),"stock");
@@ -71,7 +79,7 @@ public class BoxShipment {
                         }
                     }
                     shipment.addPackage(packageDetails);
-                    eventPublisher.publish(new ShipmentBoxedEvent(UUID.randomUUID(), shipment), "shipment");
+                    eventPublisher.publish(new ShipmentBoxed(UUID.randomUUID(), shipment), "shipment");
                     shipmentRepository.save(shipment);
                 }
             }

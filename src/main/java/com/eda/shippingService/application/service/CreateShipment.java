@@ -1,6 +1,6 @@
 package com.eda.shippingService.application.service;
 
-import com.eda.shippingService.domain.dto.incoming.CreateShipmentRequestDTO;
+import com.eda.shippingService.domain.dto.incoming.RequestShipmentDTO;
 import com.eda.shippingService.domain.entity.Shipment;
 import com.eda.shippingService.infrastructure.repo.ShipmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class CreateShipment {
         this.shipmentRepository = shipmentRepository;
     }
 
-    public Shipment handle(CreateShipmentRequestDTO shipmentDTO) {
+    public Shipment handle(RequestShipmentDTO shipmentDTO) {
         if (shipmentDTO.orderId() != null && shipmentRepository.findByOrderId(shipmentDTO.orderId()) != null) {
             throw new IllegalArgumentException(String.format("Shipment with Order ID %s already exists.", shipmentDTO.orderId()));
         }

@@ -5,8 +5,8 @@ import com.eda.shippingService.domain.events.common.DomainEvent;
 
 import java.util.UUID;
 
-public class OrderConfirmedEvent extends DomainEvent<OrderConfirmedDTO> {
-    public OrderConfirmedEvent(UUID eventKey, UUID messageId, long timestamp, OrderConfirmedDTO payload) {
+public class OrderConfirmed extends DomainEvent<OrderConfirmedDTO> {
+    public OrderConfirmed(UUID eventKey, UUID messageId, long timestamp, OrderConfirmedDTO payload) {
         super(eventKey, messageId, timestamp, payload);
     }
 }

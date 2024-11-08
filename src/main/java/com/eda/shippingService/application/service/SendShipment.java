@@ -2,7 +2,7 @@ package com.eda.shippingService.application.service;
 
 import com.eda.shippingService.domain.entity.Shipment;
 import com.eda.shippingService.domain.entity.ShipmentStatus;
-import com.eda.shippingService.domain.events.ShipmentSentEvent;
+import com.eda.shippingService.domain.events.ShipmentSent;
 import com.eda.shippingService.infrastructure.eventing.EventPublisher;
 import com.eda.shippingService.infrastructure.repo.ShipmentRepository;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,7 @@ public class SendShipment {
             ShipmentStatus shipmentStatus = shipment.getStatus();
             if (shipmentStatus == ShipmentStatus.PACKAGED) {
                 shipment.send();
-                eventPublisher.publish(new ShipmentSentEvent(UUID.randomUUID(), shipment), "shipment");
+                eventPublisher.publish(new ShipmentSent(UUID.randomUUID(), shipment), "shipment");
                 shipmentRepository.save(shipment);
             }
             else {

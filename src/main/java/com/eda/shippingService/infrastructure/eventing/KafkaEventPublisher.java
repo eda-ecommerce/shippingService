@@ -29,6 +29,7 @@ public class KafkaEventPublisher implements EventPublisher {
             record.headers().add("messageId", message.getMessageId()
                     .toString()
                     .getBytes());
+            //To be removed
             record.headers().add("operation", message.getClass().getSimpleName()
                     .getBytes());
         } catch (JsonProcessingException e) {

@@ -1,7 +1,7 @@
 package com.eda.shippingService.adapters;
 
 import com.eda.shippingService.application.service.*;
-import com.eda.shippingService.domain.dto.incoming.CreateShipmentRequestDTO;
+import com.eda.shippingService.domain.dto.incoming.RequestShipmentDTO;
 import com.eda.shippingService.domain.dto.incoming.IncomingDeliveryDTO;
 import com.eda.shippingService.domain.dto.incoming.UpdateShipmentStatusRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class ShippingController {
     }
 
     @PostMapping("/shipment")
-    public void createShipment(@RequestBody CreateShipmentRequestDTO shipmentDTO) {
+    public void createShipment(@RequestBody RequestShipmentDTO shipmentDTO) {
         createShipment.handle(shipmentDTO);
     }
 
