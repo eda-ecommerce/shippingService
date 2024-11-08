@@ -2,7 +2,6 @@ package com.eda.shippingService.application.commandHandlers;
 
 import com.eda.shippingService.domain.dto.incoming.CreateShipmentRequestDTO;
 import com.eda.shippingService.domain.entity.Shipment;
-import com.eda.shippingService.domain.entity.ShipmentStatus;
 import com.eda.shippingService.infrastructure.repo.ShipmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,7 +27,7 @@ public class CreateShipment {
         }
         Shipment shipmentEntity = shipmentDTO.toEntity();
 
-        if (shipmentEntity.getStatus() == ShipmentStatus.RESERVED) {
+        if (shipmentEntity.getStatus() == null) {
             // instead of directly decreasing the stock here, we are just reserving the necessary stock amount
             // the stock will be decreased only when the shipment is boxed.
             reserveStock.handle(shipmentEntity);

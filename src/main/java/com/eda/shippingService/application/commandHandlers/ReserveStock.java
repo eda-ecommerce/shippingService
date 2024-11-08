@@ -26,12 +26,15 @@ public class ReserveStock {
 
     // returning Boolean just in case we need it in the future
     public Boolean handle(Shipment shipment) {
-        //TODO: this check will always fail if we call this on an unboxed shipment.
-        if (shipment.checkContents()) {
+        // changed the check to see if the shipment status is null instead of looking at the contents
+        if (shipment.getStatus() == null) {
             HashMap<UUID, Integer> expected = new HashMap<>();
             for (OrderLineItem orderLineItem : shipment.getRequestedProducts()){
                 expected.put(orderLineItem.getProductId(), orderLineItem.getQuantity());
             }
+
+            // if this flag is true after reserving all the products, change the shipment status to RESERVED
+            boolean stockAdjusted = true;
 
             for (UUID productId : expected.keySet()){
                 Optional<Product> product = productRepository.findById(productId);
@@ -44,6 +47,7 @@ public class ReserveStock {
                         return true;
                     }
                     else {
+                        stockAdjusted = false;
                         found.unreserveStock(expected.get(productId));
                         throw new IllegalArgumentException(String.format("The Product's stock is %s. Cannot reserve %s.", found.getStock(), expected.get(productId)));
 
@@ -53,10 +57,15 @@ public class ReserveStock {
                     throw new IllegalArgumentException(String.format("Product with ID %s not found.", productId));
                 }
             }
+
+            if (stockAdjusted) shipment.reserve();
         }
         else {
             throw new IllegalArgumentException("Shipment does not have any products.");
         }
+
+//        shipment.reserve();
+
         return false;
     }
 }
