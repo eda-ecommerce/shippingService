@@ -11,7 +11,7 @@ public class AvailableStockAdjusted extends DomainEvent<AvailableStockAdjusted.S
                 payload.getId(),
                 payload.getStock(),
                 payload.getReservedStock(),
-                payload.getStock().doubleValue() - payload.getReservedStock().doubleValue()
+                payload.getAvailableStock()
         ));
     }
 
