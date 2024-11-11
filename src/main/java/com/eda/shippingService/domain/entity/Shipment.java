@@ -51,32 +51,34 @@ public class Shipment{
     private Address origin;
 
     //At the moment we assume one package per shipment, but this could easily be changed to a list of packages
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne(cascade = CascadeType.DETACH)
     private APackage aPackage;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
     private List<OrderLineItem> requestedProducts;
+    @Transient
+    private HashMap<UUID, Integer> requestedHashMap = new HashMap<>();
 
     private ShipmentStatus status;
 
-    //I dislike that orderLineItem is not directly a HashMap, but I guess that's the "DDD/Architecture way?"
-    //Need to revisit this from a database perspective probably
-    public HashMap<UUID, Integer> getRequestedProductsAsHashMap(){
-        HashMap<UUID, Integer> requestedProducts = new HashMap<>();
-        for (OrderLineItem orderLineItem : this.requestedProducts){
-            requestedProducts.put(orderLineItem.getProductId(), orderLineItem.getQuantity());
+    public Shipment(UUID orderId, Address destination, Address origin, APackage aPackage, List<OrderLineItem> orderLineItems, ShipmentStatus status){
+        this.orderId = orderId;
+        this.destination = destination;
+        this.origin = origin;
+        this.aPackage = aPackage;
+        this.requestedProducts = orderLineItems;
+        this.status = status;
+        for (OrderLineItem orderLineItem : orderLineItems){
+            requestedHashMap.put(orderLineItem.productId(), orderLineItem.quantity());
         }
-        return requestedProducts;
     }
 
-    //That's the reason I dislike the previous method
-    //O(n) lookup time, imagine scaling this to 1000s of products every second
+    public HashMap<UUID, Integer> getRequestedProductsAsHashMap(){
+        return requestedHashMap;
+    }
+
     public Integer getProductQuantity(UUID productId){
-        OrderLineItem found = requestedProducts.stream().findAny().filter(orderLineItem -> orderLineItem.getProductId().equals(productId)).orElse(null);
-        if (found != null){
-            return found.getQuantity();
-        }
-        return 0;
+        return requestedHashMap.getOrDefault(productId, 0);
     }
 
     public void addPackage(APackage aPackage){
@@ -93,11 +95,10 @@ public class Shipment{
         return destination.validate() && origin.validate();
     }
 
-    //This is O(2n) btw
     public boolean checkContents(){
         HashMap<UUID, Integer> expected = getRequestedProductsAsHashMap();
         for (OrderLineItem orderLineItem: aPackage.getContents()){
-            if (expected.get(orderLineItem.getProductId()) == null || expected.get(orderLineItem.getProductId()) > orderLineItem.getQuantity()){
+            if (expected.get(orderLineItem.productId()) == null || expected.get(orderLineItem.productId()) > orderLineItem.quantity()){
                 return false;
             }
         }
@@ -108,14 +109,18 @@ public class Shipment{
         if (this.status == ShipmentStatus.RESERVED || this.status == null){
             this.status = ShipmentStatus.APPROVED;
         } else {
-            throw new IllegalStateException("Shipment is way past the point of no return");
+            throw new IllegalStateException("Shipment is already in state: "+this.status+" and cannot be approved.");
         }
     }
 
-    public void pack(){
-        if (this.status != ShipmentStatus.APPROVED){
-            throw new IllegalStateException("Shipment must be approved before it can be packed");
+    public void packed(){
+        if (this.status == ShipmentStatus.APPROVED){
+            if(checkContents()) {
+                this.status = ShipmentStatus.PACKAGED;
+            }
+            throw new IllegalStateException("Shipment incomplete, please check contents.");
         }
+        throw new IllegalStateException("Shipment must be approved before it can be packed");
 
     }
 
@@ -123,7 +128,15 @@ public class Shipment{
         if (this.status != ShipmentStatus.PACKAGED){
             throw new IllegalStateException("Shipment must be packaged before it can be sent");
         }
+        assignTrackingNumber(UUID.randomUUID());
         this.status = ShipmentStatus.SHIPPED;
+    }
+
+    public void inDelivery(){
+        if (this.status != ShipmentStatus.SHIPPED){
+            throw new IllegalStateException("That cant be");
+        }
+        this.status = ShipmentStatus.IN_DELIVERY;
     }
 
     public void delivered(){
@@ -133,7 +146,7 @@ public class Shipment{
         this.status = ShipmentStatus.DELIVERED;
     }
 
-    public void reserve(){
+    public void reserved(){
         if (this.status != ShipmentStatus.REQUESTED){
             throw new IllegalStateException("Shipment cannot be reserved again. Current status: " + this.status);
         }

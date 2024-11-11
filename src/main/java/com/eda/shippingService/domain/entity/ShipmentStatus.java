@@ -15,5 +15,6 @@ public enum ShipmentStatus {
     SHIPPED,
     IN_DELIVERY,
     DELIVERED,
-    RETURNED
+    RETURNED,
+    ON_HOLD
 }
