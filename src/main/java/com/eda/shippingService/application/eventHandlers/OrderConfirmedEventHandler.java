@@ -1,9 +1,9 @@
 package com.eda.shippingService.application.eventHandlers;
 
+import com.eda.shippingService.application.service.ShipmentService;
 import com.eda.shippingService.domain.entity.ProcessedMessage;
 import com.eda.shippingService.domain.events.OrderConfirmed;
 import com.eda.shippingService.infrastructure.repo.IdempotentConsumerRepository;
-import com.eda.shippingService.infrastructure.repo.ShipmentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class OrderConfirmedEventHandler implements EventHandler<OrderConfirmed> {
 
-    private final ShipmentRepository shipmentRepository;
+    private final ShipmentService shipmentService;
     private final IdempotentConsumerRepository idempotentConsumerRepository;
 
     @Autowired
-    public OrderConfirmedEventHandler(ShipmentRepository shipmentRepository, IdempotentConsumerRepository idempotentConsumerRepository) {
-        this.shipmentRepository = shipmentRepository;
+    public OrderConfirmedEventHandler(ShipmentService shipmentService, IdempotentConsumerRepository idempotentConsumerRepository) {
+        this.shipmentService = shipmentService;
         this.idempotentConsumerRepository = idempotentConsumerRepository;
     }
 
@@ -27,16 +27,8 @@ public class OrderConfirmedEventHandler implements EventHandler<OrderConfirmed> 
         if (found.isPresent()) {
             return;
         }
-        var id = event.getPayload().orderId();
-        var shipment = shipmentRepository.findById(id);
-        if (shipment.isPresent()){
-            shipment.get().approve();
-            shipmentRepository.save(shipment.get());
-        }
-        else {
-            //TODO: either handle like creation, or throw exception
-            throw new RuntimeException("Shipment not found");
-        }
+        var payload = event.getPayload();
+        shipmentService.approveShipment(payload.orderId());
         idempotentConsumerRepository.save(new ProcessedMessage(event.getMessageId(), this.getClass().getSimpleName()));
     }
 }
