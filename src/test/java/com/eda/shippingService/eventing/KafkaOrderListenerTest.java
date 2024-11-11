@@ -56,6 +56,7 @@ public class KafkaOrderListenerTest extends KafkaTest {
                                 new OrderRequestedDTO.Product(quickUUID(456), 10)
                         )
                 ));
+        // Verify that the OrderRequestedEventHandler was called with the expected event
         Mockito.verify(orderRequestedEventHandler).handle(requestedCaptor.capture());
         OrderRequested requestedEvent = requestedCaptor.getValue();
         assertEquals(requestedEvent.getMessageId(), quickUUID(111));
