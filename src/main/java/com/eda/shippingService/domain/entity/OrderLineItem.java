@@ -1,19 +1,12 @@
 package com.eda.shippingService.domain.entity;
 
 import jakarta.persistence.Embeddable;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
 @Embeddable
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OrderLineItem {
-    //Don't reference by object, reference by id
-    public UUID productId;
-    public Integer quantity;
-}
+public record OrderLineItem(
+        UUID productId,
+        Integer quantity){}
+
