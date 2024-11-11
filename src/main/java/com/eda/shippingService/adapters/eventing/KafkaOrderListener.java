@@ -1,4 +1,4 @@
-package com.eda.shippingService.adapters;
+package com.eda.shippingService.adapters.eventing;
 
 import com.eda.shippingService.application.eventHandlers.EventHandler;
 import com.eda.shippingService.domain.dto.incoming.OrderConfirmedDTO;
@@ -32,7 +32,7 @@ public class KafkaOrderListener {
     }
 
     //This should probably more fine-grained
-    @KafkaListener(topics = "order")
+    @KafkaListener(topics = "${kafka.topic.order}")
     public void listen(ConsumerRecord<String, String> record) {
         var headers = record.headers().toArray();
         var operation = Arrays.stream(headers)

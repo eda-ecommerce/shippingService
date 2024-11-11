@@ -1,4 +1,4 @@
-package com.eda.shippingService.infrastructure.eventing;
+package com.eda.shippingService.adapters.eventing;
 
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -16,6 +16,12 @@ public class KafkaTopicConfig {
     @Value(value = "${spring.kafka.bootstrap-servers}")
     private String bootstrapAddress;
 
+    @Value(value = "${kafka.topic.shipment}")
+    private String shipmentTopic;
+
+    @Value(value = "${kafka.topic.stock}")
+    private String stockTopic;
+
     @Bean
     public KafkaAdmin kafkaAdmin() {
         Map<String, Object> configs = new HashMap<>();
@@ -25,6 +31,11 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic shipmentTopic() {
-        return new NewTopic("shipment", 1, (short) 1);
+        return new NewTopic(shipmentTopic, 1, (short) 1);
     }
+    @Bean
+    public NewTopic stockTopic() {
+        return new NewTopic(stockTopic, 1, (short) 1);
+    }
+
 }

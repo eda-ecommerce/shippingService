@@ -1,4 +1,4 @@
-package com.eda.shippingService.infrastructure.eventing;
+package com.eda.shippingService.adapters.eventing;
 
 import com.eda.shippingService.domain.events.common.Message;
 
