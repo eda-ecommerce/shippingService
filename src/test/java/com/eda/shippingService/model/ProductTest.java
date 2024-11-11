@@ -13,20 +13,20 @@ public class ProductTest {
     @BeforeEach
     void init(){
         p1 = new Product(
-                10,false, "ABC", 10f, 0
+                10,0,false, "ABC", 10f
         );
     }
 
     @Test
-    void reduceStock() {
-        p1.reduceStock(5);
-        assertEquals(5.0, p1.getStock().floatValue());
+    void decrease() {
+        p1.adjustStock(-5);
+        assertEquals(5, p1.getPhysicalStock());
     }
 
     @Test
     void increaseStock() {
-        p1.increaseStock(5);
-        assertEquals(15.0,p1.getStock().floatValue());
+        p1.adjustStock(5);
+        assertEquals(15,p1.getPhysicalStock());
     }
 
     @Test

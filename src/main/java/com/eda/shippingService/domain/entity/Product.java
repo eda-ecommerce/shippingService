@@ -1,5 +1,6 @@
 package com.eda.shippingService.domain.entity;
 
+import com.eda.shippingService.application.service.exception.NotEnoughStockException;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,42 +17,41 @@ import java.util.UUID;
 @Setter
 public class Product extends AbstractEntity{
     //Should probably have more complex formats
-    private Number stock;
+    private Integer physicalStock;
+    private Integer reservedStock;
+    public Integer getAvailableStock() {
+        return this.physicalStock - this.reservedStock;
+    }
+
     private boolean retired;
     private String storageLocation;
     private Float weight;
-    private Number reservedStock;
 
-    public Product(UUID id, Number stock) {
+    public Product(UUID id, Integer physicalStock) {
         this.setId(id);
-        this.stock = stock;
+        this.physicalStock = physicalStock;
         this.retired = false;
         this.storageLocation = RandomStringGenerator.generateRandomString(5);
         this.reservedStock = 0;
     }
 
-    public void reduceStock(Number amount) {
-        this.stock = this.stock.doubleValue() - amount.doubleValue();
+    public void adjustStock(Integer amount) {
+        this.physicalStock = this.physicalStock + amount;
     }
 
-    public void increaseStock(Number amount) {
-        this.stock = this.stock.doubleValue() + amount.doubleValue();
+    public void reserveStock(Integer amount) throws NotEnoughStockException {
+        if (!isQuantityAvailable(amount)) {
+            throw new NotEnoughStockException(("Product with id: "+getId() + " has too few stock. Requested quantity: "+ amount));
+        }
+        this.reservedStock = this.reservedStock + amount;
     }
 
-    public void reserveStock(Number amount) {
-        this.reservedStock = this.reservedStock.doubleValue() + amount.doubleValue();
-    }
-
-    public void unreserveStock(Number amount) {
-        this.reservedStock = this.reservedStock.doubleValue() - amount.doubleValue();
+    public void releaseStock(Integer amount) {
+        this.reservedStock = this.reservedStock - amount;
     }
 
     public boolean isQuantityAvailable(Integer amount) {
-        return this.stock.doubleValue() - (this.reservedStock.doubleValue() + amount) > 0;
-    }
-
-    public Integer getAvailableStock() {
-        return this.stock.intValue() - this.reservedStock.intValue();
+        return this.getAvailableStock() > amount;
     }
 
     public boolean isCritical() {
