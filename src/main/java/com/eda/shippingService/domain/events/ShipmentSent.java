@@ -9,8 +9,8 @@ import com.eda.shippingService.domain.events.common.DomainEvent;
 import java.util.UUID;
 
 public class ShipmentSent extends DomainEvent<ShipmentSent.ShipmentSentPayload> {
-    public ShipmentSent(UUID eventKey, Shipment payload) {
-        super(eventKey, new ShipmentSentPayload(
+    public ShipmentSent(Shipment payload) {
+        super(null, new ShipmentSentPayload(
                 payload.getOrderId(),
                 PackageDTO.fromEntity(payload.getAPackage()),
                 AddressDTO.fromEntity(payload.getDestination()),

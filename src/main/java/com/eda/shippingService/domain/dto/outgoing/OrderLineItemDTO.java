@@ -25,8 +25,8 @@ public record OrderLineItemDTO(
     }
     public static OrderLineItemDTO fromEntity(OrderLineItem orderLineItem){
         return new OrderLineItemDTO(
-                orderLineItem.getProductId(),
-                orderLineItem.getQuantity()
+                orderLineItem.productId(),
+                orderLineItem.quantity()
         );
     }
 }
