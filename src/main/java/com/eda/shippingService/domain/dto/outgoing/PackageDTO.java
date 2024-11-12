@@ -1,5 +1,6 @@
 package com.eda.shippingService.domain.dto.outgoing;
 
+import com.eda.shippingService.domain.dto.common.OrderLineItemDTO;
 import com.eda.shippingService.domain.entity.APackage;
 import com.eda.shippingService.domain.entity.OrderLineItem;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -24,6 +25,7 @@ public record PackageDTO(
     public static PackageDTO fromEntity(APackage aPackage){
         return new PackageDTO(
                 aPackage.getId(),
+                //Actually sets null if trackingNumber is null
                 aPackage.getTrackingNumber() != null ? aPackage.getTrackingNumber() : null,
                 new PackageDimensions(
                         aPackage.getDimensions().height(),
@@ -39,10 +41,6 @@ public record PackageDTO(
     }
 
     public APackage toEntity(){
-        List<OrderLineItem> contentsE = this.contents().stream()
-                .map(OrderLineItemDTO::toEntity)
-                .toList();
-
         return new APackage(
                 trackingNumber,
                 new com.eda.shippingService.domain.entity.PackageDimensions(
@@ -51,7 +49,9 @@ public record PackageDTO(
                         dimensions().depth(),
                         dimensions().volume()),
                 weight,
-                contentsE
+                this.contents().stream()
+                        .map(OrderLineItemDTO::toEntity)
+                        .toList()
                 );
     }
 }

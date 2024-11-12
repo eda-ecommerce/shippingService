@@ -1,4 +1,4 @@
-package com.eda.shippingService.domain.dto.outgoing;
+package com.eda.shippingService.domain.dto.common;
 
 import com.eda.shippingService.domain.entity.OrderLineItem;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;

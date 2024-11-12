@@ -1,4 +1,6 @@
 package com.eda.shippingService.domain.dto.outgoing;
+import com.eda.shippingService.domain.dto.common.AddressDTO;
+import com.eda.shippingService.domain.dto.common.OrderLineItemDTO;
 import com.eda.shippingService.domain.entity.*;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
