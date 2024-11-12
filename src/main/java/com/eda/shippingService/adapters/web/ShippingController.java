@@ -1,13 +1,15 @@
 package com.eda.shippingService.adapters.web;
 
 import com.eda.shippingService.application.service.*;
-import com.eda.shippingService.domain.dto.incoming.RequestShipmentDTO;
-import com.eda.shippingService.domain.dto.incoming.IncomingDeliveryDTO;
+import com.eda.shippingService.domain.dto.incoming.IncomingPackageDTO;
+import com.eda.shippingService.domain.dto.incoming.ShipmentContentsDTO;
 import com.eda.shippingService.domain.dto.incoming.UpdateShipmentStatusDTO;
+import com.eda.shippingService.domain.dto.outgoing.ShipmentDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController("/shipment")
 public class ShippingController {
@@ -20,15 +22,22 @@ public class ShippingController {
         this.shipmentService = shipmentService;
     }
 
-    @PostMapping("/")
-    public void requestShipment(@RequestBody RequestShipmentDTO shipmentDTO) {
-        shipmentService.requestShipment(shipmentDTO);
+    @PostMapping("/{orderId}")
+    public ResponseEntity<ShipmentDTO> requestShipment(@PathVariable UUID orderId, @RequestBody ShipmentContentsDTO shipmentDTO) {
+        return ResponseEntity.ok(shipmentService.requestShipment(orderId, shipmentDTO));
     }
 
     @PostMapping("/status")
-    public void setStatus(@RequestBody UpdateShipmentStatusDTO shipmentDTO) {
-        shipmentService.externalShipmentStatusUpdate(shipmentDTO);
+    public ResponseEntity<ShipmentDTO> setStatus(@RequestBody UpdateShipmentStatusDTO shipmentDTO) {
+        return ResponseEntity.ok(shipmentService.externalShipmentStatusUpdate(shipmentDTO));
     }
+
+    @PostMapping("/{orderId}/package")
+    public ResponseEntity<ShipmentDTO> boxShipment(@RequestBody IncomingPackageDTO packageDTO, @PathVariable UUID orderId){
+        var dto = shipmentService.boxShipment(orderId, packageDTO);
+        return ResponseEntity.ok(dto);
+    }
+
     /*
     Routes:
     POST /shipment

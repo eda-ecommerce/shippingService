@@ -3,6 +3,7 @@ package com.eda.shippingService.application.service;
 import com.eda.shippingService.adapters.eventing.EventPublisher;
 import com.eda.shippingService.application.service.exception.NotEnoughStockException;
 import com.eda.shippingService.domain.dto.outgoing.StockDTO;
+import com.eda.shippingService.domain.entity.OrderLineItem;
 import com.eda.shippingService.domain.entity.Product;
 import com.eda.shippingService.domain.events.AvailableStockAdjusted;
 import com.eda.shippingService.domain.events.OutOfStock;
@@ -11,9 +12,9 @@ import com.eda.shippingService.infrastructure.repo.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -101,6 +102,12 @@ public class StockServiceImpl implements StockService {
     public void batchAdjustStock(Map<UUID, Integer> map) {
         for(UUID id: map.keySet()){
             adjustStock(id, map.get(id));
+        }
+    }
+
+    public void batchAdjustStock(List<OrderLineItem> orderLineItems) {
+        for(OrderLineItem item: orderLineItems){
+            adjustStock(item.productId(), item.quantity());
         }
     }
 
