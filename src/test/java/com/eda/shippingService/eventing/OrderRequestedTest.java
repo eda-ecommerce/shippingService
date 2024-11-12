@@ -5,11 +5,11 @@ import com.eda.shippingService.TestHelpers;
 import com.eda.shippingService.application.eventHandlers.OrderRequestedEventHandler;
 import com.eda.shippingService.application.service.ShipmentService;
 import com.eda.shippingService.domain.dto.incoming.OrderRequestedDTO;
-import com.eda.shippingService.domain.dto.incoming.RequestShipmentDTO;
+import com.eda.shippingService.domain.dto.incoming.ShipmentContentsDTO;
 import com.eda.shippingService.domain.dto.outgoing.ShipmentDTO;
 import com.eda.shippingService.domain.entity.*;
 import com.eda.shippingService.domain.events.OrderRequested;
-import com.eda.shippingService.infrastructure.repo.IdempotentConsumerRepository;
+import com.eda.shippingService.infrastructure.repo.IdempotentHandlerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,13 +31,13 @@ import static com.eda.shippingService.TestHelpers.quickUUID;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
-@SpringBootTest(properties = {"spring.autoconfigure.exclude="})
+@SpringBootTest()
 public class OrderRequestedTest extends KafkaTest {
         @MockBean
         private ShipmentService shipmentService;
 
         @MockBean
-        private IdempotentConsumerRepository idempotentConsumerRepository;
+        private IdempotentHandlerRepository idempotentHandlerRepository;
 
         @Autowired
         private OrderRequestedEventHandler orderRequestedEventHandler;
@@ -82,22 +82,22 @@ public class OrderRequestedTest extends KafkaTest {
 
                 //Mocks
                 //Message has not been processed yet
-                Mockito.when(idempotentConsumerRepository.findByMessageIdAndHandlerName(Mockito.any(UUID.class), Mockito.anyString())).thenReturn(Optional.empty());
+                Mockito.when(idempotentHandlerRepository.findByMessageIdAndHandlerName(Mockito.any(UUID.class), Mockito.anyString())).thenReturn(Optional.empty());
 
                 //Saving is possible
-                Mockito.when(idempotentConsumerRepository.save(Mockito.any())).thenReturn(
+                Mockito.when(idempotentHandlerRepository.save(Mockito.any())).thenReturn(
                         new ProcessedMessage(messageId, OrderRequestedEventHandler.class.getSimpleName()
                         ));
 
                 //Creating a Shipment Works
-                Mockito.when(shipmentService.requestShipment(Mockito.any(RequestShipmentDTO.class))).thenReturn(givenShipment);
+                Mockito.when(shipmentService.requestShipment(orderID,Mockito.any(ShipmentContentsDTO.class))).thenReturn(ShipmentDTO.fromEntity(givenShipment));
 
                 //When
                 orderRequestedEventHandler.handle(givenOrderRequested);
 
                 //Then
                 //The createShipment method should be called once
-                Mockito.verify(shipmentService, Mockito.times(1)).requestShipment(Mockito.any());
+                Mockito.verify(shipmentService, Mockito.times(1)).requestShipment(orderID,Mockito.any());
                 //An event is published
                 Thread.sleep(1000);
                 var record = super.getConsumedRecords().get(0);
@@ -135,22 +135,22 @@ public class OrderRequestedTest extends KafkaTest {
                 //Mocks
                 //Message has already been processed
                 Mockito
-                        .when(idempotentConsumerRepository.findByMessageIdAndHandlerName(Mockito.any(UUID.class), Mockito.anyString()))
+                        .when(idempotentHandlerRepository.findByMessageIdAndHandlerName(Mockito.any(UUID.class), Mockito.anyString()))
                         .thenReturn(Optional.of(new ProcessedMessage(messageId, OrderRequestedEventHandler.class.getSimpleName())));
 
                 //Saving is possible
-                Mockito.when(idempotentConsumerRepository.save(Mockito.any())).thenReturn(
+                Mockito.when(idempotentHandlerRepository.save(Mockito.any())).thenReturn(
                         new ProcessedMessage(messageId, OrderRequestedEventHandler.class.getSimpleName()
                         ));
 
                 //Creating a Shipment Works
-                Mockito.when(shipmentService.requestShipment(Mockito.any())).thenReturn(requestedShipment);
+                Mockito.when(shipmentService.requestShipment(Mockito.any(),Mockito.any())).thenReturn(ShipmentDTO.fromEntity(requestedShipment));
 
                 //When
                 orderRequestedEventHandler.handle(orderRequested);
 
                 //Then
-                Mockito.verify(shipmentService, Mockito.times(0)).requestShipment(Mockito.any());
+                Mockito.verify(shipmentService, Mockito.times(0)).requestShipment(Mockito.any(),Mockito.any());
                 Assertions.assertFalse(shipmentListenerLatch.await(1, TimeUnit.SECONDS));
         }
 }

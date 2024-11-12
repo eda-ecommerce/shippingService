@@ -60,6 +60,6 @@ public class KafkaOrderListenerTest extends KafkaTest {
         Mockito.verify(orderRequestedEventHandler).handle(requestedCaptor.capture());
         OrderRequested requestedEvent = requestedCaptor.getValue();
         assertEquals(requestedEvent.getMessageId(), quickUUID(111));
-        assertEquals(requestedEvent.getPayload().products().get(0).quantity(), expected.getPayload().products().get(0).quantity());
+        assertEquals(requestedEvent.getMessageValue().products().get(0).quantity(), expected.getMessageValue().products().get(0).quantity());
     }
 }

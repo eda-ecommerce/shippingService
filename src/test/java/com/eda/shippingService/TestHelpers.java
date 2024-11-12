@@ -1,7 +1,7 @@
 package com.eda.shippingService;
 
-import com.eda.shippingService.domain.dto.outgoing.AddressDTO;
-import com.eda.shippingService.domain.dto.outgoing.OrderLineItemDTO;
+import com.eda.shippingService.domain.dto.common.AddressDTO;
+import com.eda.shippingService.domain.dto.common.OrderLineItemDTO;
 import com.eda.shippingService.domain.dto.outgoing.PackageDTO;
 import com.eda.shippingService.domain.dto.outgoing.ShipmentDTO;
 import com.eda.shippingService.domain.entity.Address;

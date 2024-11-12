@@ -8,7 +8,7 @@ import com.eda.shippingService.domain.entity.ProcessedMessage;
 import com.eda.shippingService.domain.entity.Shipment;
 import com.eda.shippingService.domain.entity.ShipmentStatus;
 import com.eda.shippingService.domain.events.OrderConfirmed;
-import com.eda.shippingService.infrastructure.repo.IdempotentConsumerRepository;
+import com.eda.shippingService.infrastructure.repo.IdempotentHandlerRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -32,7 +32,7 @@ public class OrderConfirmedHandlerTest {
     @MockBean
     private ShipmentService shipmentService;
     @MockBean
-    IdempotentConsumerRepository idempotentConsumerRepository;
+    IdempotentHandlerRepository idempotentHandlerRepository;
 
     @Test
     public void shouldApproveShipment() {
@@ -53,8 +53,8 @@ public class OrderConfirmedHandlerTest {
                 )
                 ));
         //Mocks
-        Mockito.when(idempotentConsumerRepository.findByMessageIdAndHandlerName(Mockito.any(), Mockito.any())).thenReturn(Optional.empty());
-        Mockito.when(idempotentConsumerRepository.save(Mockito.any())).thenReturn(Mockito.mock(ProcessedMessage.class));
+        Mockito.when(idempotentHandlerRepository.findByMessageIdAndHandlerName(Mockito.any(), Mockito.any())).thenReturn(Optional.empty());
+        Mockito.when(idempotentHandlerRepository.save(Mockito.any())).thenReturn(Mockito.mock(ProcessedMessage.class));
         Mockito.doNothing().when(shipmentService).approveShipment(Mockito.any());
         //When
         orderConfirmedEventHandler.handle(orderConfirmedEvent);
