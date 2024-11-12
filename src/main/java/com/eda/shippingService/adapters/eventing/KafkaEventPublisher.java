@@ -24,7 +24,7 @@ public class KafkaEventPublisher implements EventPublisher {
         ProducerRecord<String, String> record = null;
         try {
             record = new ProducerRecord<>(topic, objectMapper
-                    .writeValueAsString(message.getPayload())
+                    .writeValueAsString(message.getMessageValue())
             );
             record.headers().add("messageId", message.getMessageId()
                     .toString()

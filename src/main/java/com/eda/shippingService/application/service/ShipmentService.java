@@ -11,10 +11,7 @@ import com.eda.shippingService.domain.dto.outgoing.ShipmentDTO;
 import com.eda.shippingService.domain.entity.Address;
 import com.eda.shippingService.domain.entity.Shipment;
 import com.eda.shippingService.domain.entity.ShipmentStatus;
-import com.eda.shippingService.domain.events.ShipmentImpossible;
-import com.eda.shippingService.domain.events.ShipmentRequested;
-import com.eda.shippingService.domain.events.ShipmentReturned;
-import com.eda.shippingService.domain.events.ShipmentSent;
+import com.eda.shippingService.domain.events.*;
 import com.eda.shippingService.infrastructure.repo.ShipmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -84,6 +81,7 @@ public class ShipmentService  {
         if (aPackage.getContents().equals(found.getRequestedProducts())){
             found.addPackage(aPackage);
             shipmentRepository.save(found);
+            eventPublisher.publish(new ShipmentBoxed(found), shipmentTopic);
             return ShipmentDTO.fromEntity(found);
         }
         throw new IncompleteContentException("Contents dont match requested products.");
