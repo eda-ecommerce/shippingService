@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public class AvailableStockAdjusted extends DomainEvent<StockDTO> {
-    public AvailableStockAdjusted( StockDTO payload) {
-        super(null, payload);
+    public AvailableStockAdjusted(StockDTO payload) {
+        super(payload);
     }
 }

@@ -1,6 +1,6 @@
 package com.eda.shippingService.domain.events;
 
-import com.eda.shippingService.domain.dto.outgoing.AddressDTO;
+import com.eda.shippingService.domain.dto.common.AddressDTO;
 import com.eda.shippingService.domain.dto.outgoing.PackageDTO;
 import com.eda.shippingService.domain.entity.Shipment;
 import com.eda.shippingService.domain.entity.ShipmentStatus;

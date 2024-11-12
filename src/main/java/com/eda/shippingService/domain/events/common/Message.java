@@ -3,7 +3,6 @@ package com.eda.shippingService.domain.events.common;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
-import org.springframework.lang.Nullable;
 
 import java.util.UUID;
 
@@ -12,23 +11,26 @@ import java.util.UUID;
 @JsonIgnoreProperties
 public abstract class Message<T> {
     private final UUID messageId;
-    @Nullable
-    private final UUID eventKey;
+    private final UUID messageKey;
     private final long timestamp;
-    private final T payload;
+    private final T messageValue;
 
-    public Message(@Nullable UUID eventKey, T payload) {
-        this.eventKey = eventKey;
-        this.timestamp = System.currentTimeMillis();
-        this.messageId = UUID.randomUUID();
-        this.payload = payload;
+    public Message(T messageValue) {
+        this(null, messageValue);
     }
 
-    public Message(@Nullable UUID eventKey, UUID messageId, long timestamp, T payload) {
-        this.eventKey = eventKey;
-        this.timestamp = timestamp;
+    public Message(UUID messageKey, T messageValue) {
+        this.messageKey = messageKey;
+        this.timestamp = System.currentTimeMillis();
+        this.messageId = UUID.randomUUID();
+        this.messageValue = messageValue;
+    }
+
+    public Message(UUID messageId, UUID messageKey, long timestamp, T messageValue) {
         this.messageId = messageId;
-        this.payload = payload;
+        this.messageKey = messageKey;
+        this.timestamp = timestamp;
+        this.messageValue = messageValue;
     }
 }
 

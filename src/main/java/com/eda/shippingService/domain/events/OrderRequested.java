@@ -10,6 +10,6 @@ import java.util.UUID;
 @Getter
 public class OrderRequested extends DomainEvent<OrderRequestedDTO>{
     public OrderRequested(UUID eventKey, UUID messageId, long timestamp, OrderRequestedDTO payload) {
-        super(eventKey,messageId,timestamp, payload);
+        super(messageId,eventKey, timestamp, payload);
     }
 }

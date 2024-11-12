@@ -1,6 +1,6 @@
 package com.eda.shippingService.domain.events;
 
-import com.eda.shippingService.domain.dto.outgoing.AddressDTO;
+import com.eda.shippingService.domain.dto.common.AddressDTO;
 import com.eda.shippingService.domain.dto.outgoing.PackageDTO;
 import com.eda.shippingService.domain.entity.Shipment;
 import com.eda.shippingService.domain.entity.ShipmentStatus;
@@ -13,8 +13,8 @@ import com.google.j2objc.annotations.Property;
 import java.util.UUID;
 
 public class ShipmentBoxed extends DomainEvent<ShipmentBoxed.ShipmentBoxedPayload> {
-    public ShipmentBoxed(UUID eventKey, Shipment payload) {
-        super(eventKey, new ShipmentBoxedPayload(
+    public ShipmentBoxed(Shipment payload) {
+        super(new ShipmentBoxedPayload(
                 payload.getOrderId(),
                 PackageDTO.fromEntity(payload.getAPackage()),
                 AddressDTO.fromEntity(payload.getDestination()),
