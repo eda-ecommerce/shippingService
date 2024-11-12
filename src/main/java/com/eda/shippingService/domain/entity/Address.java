@@ -17,7 +17,7 @@ public class Address {
 
     //You would use some Validation framework here
     public boolean validate(){
-        return country != null && country.equals("DE");
+        return country != null && (country.equals("DE") || country.equals("Germany") || country.equals("Deutschland"));
     }
 
     @Override
