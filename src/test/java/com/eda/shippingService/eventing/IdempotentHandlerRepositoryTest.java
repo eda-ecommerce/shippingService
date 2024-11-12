@@ -4,7 +4,7 @@ import com.eda.shippingService.application.eventHandlers.OrderRequestedEventHand
 import com.eda.shippingService.domain.dto.incoming.OrderRequestedDTO;
 import com.eda.shippingService.domain.entity.ProcessedMessage;
 import com.eda.shippingService.domain.events.OrderRequested;
-import com.eda.shippingService.infrastructure.repo.IdempotentConsumerRepository;
+import com.eda.shippingService.infrastructure.repo.IdempotentHandlerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @Slf4j
-class IdempotentConsumerRepositoryTest {
+class IdempotentHandlerRepositoryTest {
     @Autowired
-    private IdempotentConsumerRepository idempotentConsumerRepository;
+    private IdempotentHandlerRepository idempotentHandlerRepository;
 
     @Test
     void shouldFindEntry() {
@@ -38,9 +38,9 @@ class IdempotentConsumerRepositoryTest {
         );
 
         // Act
-        idempotentConsumerRepository.save(new ProcessedMessage(event.getMessageId(), OrderRequestedEventHandler.class.getSimpleName()));
+        idempotentHandlerRepository.save(new ProcessedMessage(event.getMessageId(), OrderRequestedEventHandler.class.getSimpleName()));
 
         // Assert
-        assertTrue(idempotentConsumerRepository.findByMessageIdAndHandlerName(event.getMessageId(), OrderRequestedEventHandler.class.getSimpleName()).isPresent());
+        assertTrue(idempotentHandlerRepository.findByMessageIdAndHandlerName(event.getMessageId(), OrderRequestedEventHandler.class.getSimpleName()).isPresent());
     }
 }

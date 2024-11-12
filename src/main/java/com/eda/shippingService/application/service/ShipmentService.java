@@ -3,11 +3,12 @@ package com.eda.shippingService.application.service;
 import com.eda.shippingService.adapters.eventing.EventPublisher;
 import com.eda.shippingService.application.service.exception.IncompleteContentException;
 import com.eda.shippingService.application.service.exception.NotEnoughStockException;
-import com.eda.shippingService.domain.dto.incoming.RequestShipmentDTO;
+import com.eda.shippingService.domain.dto.incoming.IncomingPackageDTO;
+import com.eda.shippingService.domain.dto.incoming.ShipmentContentsDTO;
 import com.eda.shippingService.domain.dto.incoming.UpdateShipmentStatusDTO;
-import com.eda.shippingService.domain.dto.outgoing.AddressDTO;
-import com.eda.shippingService.domain.dto.outgoing.PackageDTO;
+import com.eda.shippingService.domain.dto.common.AddressDTO;
 import com.eda.shippingService.domain.dto.outgoing.ShipmentDTO;
+import com.eda.shippingService.domain.entity.Address;
 import com.eda.shippingService.domain.entity.Shipment;
 import com.eda.shippingService.domain.entity.ShipmentStatus;
 import com.eda.shippingService.domain.events.ShipmentImpossible;
@@ -17,7 +18,6 @@ import com.eda.shippingService.domain.events.ShipmentSent;
 import com.eda.shippingService.infrastructure.repo.ShipmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -38,12 +38,12 @@ public class ShipmentService  {
     }
 
     //it would be so easy to confuse destination and origin, should there be separate data types?
-    public Shipment provideShippingAddresses(UUID orderId, AddressDTO destination, AddressDTO origin) {
+    public Shipment provideShippingAddress(UUID orderId, AddressDTO destination) {
         var found = shipmentRepository.findById(orderId);
         if (found.isPresent() && found.get().getStatus() == ShipmentStatus.REQUESTED) {
             var shipment = found.get();
             shipment.setDestination(destination.toEntity());
-            shipment.setOrigin(origin.toEntity());
+            shipment.setOrigin(new Address("Our Street", "Our City", "NRW","50667","Germany"));
             return shipmentRepository.save(shipment);
         } else {
             throw new IllegalStateException("Order with id " +orderId+ " does not exist or is not in the correct state");
@@ -56,12 +56,9 @@ public class ShipmentService  {
         shipmentRepository.save(found);
     }
 
-    public Shipment requestShipment(RequestShipmentDTO shipmentDTO){
-        if (shipmentDTO.orderId() == null || shipmentRepository.findByOrderId(shipmentDTO.orderId()) == null) {
-            //Is this wanted behaviour? We could also just accept it and save over it?
-            throw new IllegalArgumentException(String.format("Shipment with Order ID %s already exists.", shipmentDTO.orderId()));
-        }
-        Shipment shipmentEntity = shipmentDTO.toEntity();
+    public ShipmentDTO requestShipment(UUID orderId, ShipmentContentsDTO shipmentDTO){
+        //TODO: Change RequestShipmentDTO to not include Shipping Addresses / Prevent Event From overwriting shipping address selected.
+        Shipment shipmentEntity = shipmentDTO.toEntity(orderId);
         //Could be handled differently if we catch each reserve stock call and set status to partially complete or something / send out a smaller package
         try {
             for (var item: shipmentEntity.getRequestedProducts()) {
@@ -69,28 +66,41 @@ public class ShipmentService  {
             }
             shipmentEntity.reserved();
             eventPublisher.publish(new ShipmentRequested(ShipmentDTO.fromEntity(shipmentEntity)), shipmentTopic);
-            return shipmentRepository.save(shipmentEntity);
+            shipmentRepository.save(shipmentEntity);
+            return ShipmentDTO.fromEntity(shipmentEntity);
         } catch (NotEnoughStockException e){
-            eventPublisher.publish(new ShipmentImpossible(ShipmentDTO.fromEntity(shipmentEntity)), shipmentTopic);
             shipmentEntity.setStatus(ShipmentStatus.ON_HOLD);
-            return shipmentRepository.save(shipmentEntity);
+            // Should this be called shipmentImpossible ord on hold/needs intervention?
+            eventPublisher.publish(new ShipmentImpossible(ShipmentDTO.fromEntity(shipmentEntity)), shipmentTopic);
+            shipmentRepository.save(shipmentEntity);
+            return ShipmentDTO.fromEntity(shipmentEntity);
         }
     }
-    //Either like this
-    public Shipment boxShipment(UUID orderId, PackageDTO packageDTO) throws IncompleteContentException {
+    //This assumes that we call this with a complete package, maybe by an external working system. Idk if thats too much assumption
+    //Otherwise call this with add content, but that would maybe justify a package service + reversal of dependencies for package
+    public ShipmentDTO boxShipment(UUID orderId, IncomingPackageDTO packageDTO) throws IncompleteContentException {
         var found = shipmentRepository.findById(orderId).orElseThrow(() -> new IllegalStateException("Order with id " +orderId+ " does not exist"));
-        var aPackage = packageDTO.toEntity();
+        var aPackage = packageDTO.toPackage();
         if (aPackage.getContents().equals(found.getRequestedProducts())){
             found.addPackage(aPackage);
-            return shipmentRepository.save(found);
+            shipmentRepository.save(found);
+            return ShipmentDTO.fromEntity(found);
         }
-        throw new IncompleteContentException("Contents dont match requested products.y");
+        throw new IncompleteContentException("Contents dont match requested products.");
     }
 
 
     public void deleteShipment(UUID orderId){
         var found = shipmentRepository.findById(orderId).orElseThrow(() -> new IllegalStateException("Order with id " +orderId+ " does not exist"));
         shipmentRepository.delete(found);
+        switch (found.getStatus()){
+            case RESERVED, APPROVED, PACKAGED: {
+                for (var item: found.getRequestedProducts()) {
+                    stockService.releaseStock(item.productId(), item.quantity());
+                }
+                break;
+            }
+        }
     }
 
     public void sendShipment(UUID orderId){
@@ -103,25 +113,16 @@ public class ShipmentService  {
         }
     }
 
-    public void externalShipmentStatusUpdate(UpdateShipmentStatusDTO dto){
+    public ShipmentDTO externalShipmentStatusUpdate(UpdateShipmentStatusDTO dto){
         var found = shipmentRepository.findById(dto.orderId()).orElseThrow(() -> new IllegalStateException("Order with id " +dto.orderId()+ " does not exist"));
         switch (dto.externalShipmentStatus()){
-            case SHIPPED -> {
-                break;
-            }
-            case IN_DELIVERY -> {
-                found.inDelivery();
-                break;
-            }
-            case DELIVERED -> {
-                found.delivered();
-            }
-            case FAILED -> {
-                eventPublisher.publish(new ShipmentImpossible(ShipmentDTO.fromEntity(found)), shipmentTopic);
-            }
-            case RETURNED -> {
-                eventPublisher.publish(new ShipmentReturned(ShipmentDTO.fromEntity(found)), shipmentTopic);
-            }
+            case SHIPPED -> {}
+            case IN_DELIVERY -> found.inDelivery();
+            case DELIVERED -> found.delivered();
+            case FAILED -> eventPublisher.publish(new ShipmentImpossible(ShipmentDTO.fromEntity(found)), shipmentTopic);
+            case RETURNED -> eventPublisher.publish(new ShipmentReturned(ShipmentDTO.fromEntity(found)), shipmentTopic);
+            default -> throw new IllegalStateException("Unexpected value: " + dto.externalShipmentStatus());
         }
+        return ShipmentDTO.fromEntity(found);
     }
 }
