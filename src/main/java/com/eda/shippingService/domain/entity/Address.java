@@ -1,6 +1,5 @@
 package com.eda.shippingService.domain.entity;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @AllArgsConstructor

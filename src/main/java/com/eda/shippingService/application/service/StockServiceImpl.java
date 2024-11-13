@@ -34,6 +34,11 @@ public class StockServiceImpl implements StockService {
         this.eventPublisher = eventPublisher;
     }
 
+    public void registerNewProduct(UUID productId, int quantity) {
+        Product product = new Product(productId, quantity);
+        productRepository.save(product);
+    }
+
     /**
      * Try reserving stock for a specific product
      * @param productID the product id that is affected

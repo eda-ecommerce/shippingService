@@ -9,6 +9,7 @@ import com.eda.shippingService.domain.dto.incoming.UpdateShipmentStatusDTO;
 import com.eda.shippingService.domain.dto.common.AddressDTO;
 import com.eda.shippingService.domain.dto.outgoing.ShipmentDTO;
 import com.eda.shippingService.domain.entity.Address;
+import com.eda.shippingService.domain.entity.OrderLineItem;
 import com.eda.shippingService.domain.entity.Shipment;
 import com.eda.shippingService.domain.entity.ShipmentStatus;
 import com.eda.shippingService.domain.events.*;
@@ -78,6 +79,10 @@ public class ShipmentService  {
     public ShipmentDTO boxShipment(UUID orderId, IncomingPackageDTO packageDTO) throws IncompleteContentException {
         var found = shipmentRepository.findById(orderId).orElseThrow(() -> new IllegalStateException("Order with id " +orderId+ " does not exist"));
         var aPackage = packageDTO.toPackage();
+        for (OrderLineItem item: aPackage.getContents()) {
+            stockService.releaseStock(item.productId(), item.quantity());
+            stockService.adjustStock(item.productId(), -item.quantity());
+        }
         if (aPackage.getContents().equals(found.getRequestedProducts())){
             found.addPackage(aPackage);
             shipmentRepository.save(found);
@@ -116,11 +121,14 @@ public class ShipmentService  {
         switch (dto.externalShipmentStatus()){
             case SHIPPED -> {}
             case IN_DELIVERY -> found.inDelivery();
-            case DELIVERED -> found.delivered();
+            case DELIVERED -> {found.delivered();
+                eventPublisher.publish(new ShipmentDelivered(dto.orderId(), ShipmentDTO.fromEntity(found)), shipmentTopic);
+            }
             case FAILED -> eventPublisher.publish(new ShipmentImpossible(ShipmentDTO.fromEntity(found)), shipmentTopic);
             case RETURNED -> eventPublisher.publish(new ShipmentReturned(ShipmentDTO.fromEntity(found)), shipmentTopic);
             default -> throw new IllegalStateException("Unexpected value: " + dto.externalShipmentStatus());
         }
+        shipmentRepository.save(found);
         return ShipmentDTO.fromEntity(found);
     }
 }

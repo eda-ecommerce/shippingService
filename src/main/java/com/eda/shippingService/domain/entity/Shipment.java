@@ -1,7 +1,6 @@
 package com.eda.shippingService.domain.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,7 +34,6 @@ public class Shipment{
                     @AttributeOverride(name = "country", column = @Column(name = "destination_country"))
             }
     )
-    @NotNull
     private Address destination;
     @Embedded
     @AttributeOverrides(
@@ -47,7 +45,6 @@ public class Shipment{
                     @AttributeOverride(name = "country", column = @Column(name = "origin_country"))
             }
     )
-    @NotNull
     private Address origin;
 
     //At the moment we assume one package per shipment, but this could easily be changed to a list of packages
@@ -147,7 +144,7 @@ public class Shipment{
     }
 
     public void reserved(){
-        if (this.status != ShipmentStatus.REQUESTED){
+        if (this.status == null || this.status != ShipmentStatus.REQUESTED){
             throw new IllegalStateException("Shipment cannot be reserved again. Current status: " + this.status);
         }
         this.status = ShipmentStatus.RESERVED;

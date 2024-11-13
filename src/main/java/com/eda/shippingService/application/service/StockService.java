@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface StockService {
+    void registerNewProduct(UUID productId, int quantity);
     void reserveStock(UUID productID, int quantity) throws NotEnoughStockException;
     void releaseStock(UUID productID, int quantity);
     void adjustStock(UUID productID, int quantity);

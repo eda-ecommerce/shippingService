@@ -5,13 +5,15 @@ import com.eda.shippingService.domain.dto.incoming.IncomingPackageDTO;
 import com.eda.shippingService.domain.dto.incoming.ShipmentContentsDTO;
 import com.eda.shippingService.domain.dto.incoming.UpdateShipmentStatusDTO;
 import com.eda.shippingService.domain.dto.outgoing.ShipmentDTO;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@RestController("/shipment")
+@RestController
+@RequestMapping("/shipment")
 public class ShippingController {
     private final ShipmentService shipmentService;
 
@@ -22,12 +24,13 @@ public class ShippingController {
         this.shipmentService = shipmentService;
     }
 
+    @Operation(summary = "Request a shipment")
     @PostMapping("/{orderId}")
     public ResponseEntity<ShipmentDTO> requestShipment(@PathVariable UUID orderId, @RequestBody ShipmentContentsDTO shipmentDTO) {
         return ResponseEntity.ok(shipmentService.requestShipment(orderId, shipmentDTO));
     }
 
-    @PostMapping("/status")
+    @PostMapping("/{orderId}/status")
     public ResponseEntity<ShipmentDTO> setStatus(@RequestBody UpdateShipmentStatusDTO shipmentDTO) {
         return ResponseEntity.ok(shipmentService.externalShipmentStatusUpdate(shipmentDTO));
     }

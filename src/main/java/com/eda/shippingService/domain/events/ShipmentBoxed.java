@@ -8,7 +8,6 @@ import com.eda.shippingService.domain.events.common.DomainEvent;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.j2objc.annotations.Property;
 
 import java.util.UUID;
 
@@ -29,11 +28,11 @@ public class ShipmentBoxed extends DomainEvent<ShipmentBoxed.ShipmentBoxedPayloa
             UUID orderId,
             @JsonProperty("package")
             PackageDTO packageDTO,
-            @Property("destination")
+            @JsonProperty("destination")
             AddressDTO dest,
-            @Property("origin")
+            @JsonProperty("origin")
             AddressDTO origin,
-            @Property("status")
+            @JsonProperty("status")
             ShipmentStatus status
     ){}
 }

@@ -1,5 +1,7 @@
 package com.eda.shippingService.infrastructure.repo;
 
+import jakarta.persistence.Id;
+
 import java.io.Serializable;
 import java.util.UUID;
 

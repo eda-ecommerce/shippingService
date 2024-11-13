@@ -22,6 +22,9 @@ public class KafkaTopicConfig {
     @Value(value = "${kafka.topic.stock}")
     private String stockTopic;
 
+    @Value(value = "${kafka.topic.commands}")
+    private String commandTopic;
+
     @Bean
     public KafkaAdmin kafkaAdmin() {
         Map<String, Object> configs = new HashMap<>();
@@ -37,5 +40,8 @@ public class KafkaTopicConfig {
     public NewTopic stockTopic() {
         return new NewTopic(stockTopic, 1, (short) 1);
     }
-
+    @Bean
+    public NewTopic commandTopic() {
+        return new NewTopic(commandTopic, 1, (short) 1);
+    }
 }

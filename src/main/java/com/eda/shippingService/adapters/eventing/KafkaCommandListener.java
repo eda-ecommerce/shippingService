@@ -31,7 +31,7 @@ public class KafkaCommandListener {
         this.shipmentAddressSelectedHandler = shipmentAddressSelectedHandler;
     }
 
-    @KafkaListener(topics = {"{$kafka.topic.commands}"})
+    @KafkaListener(topics = "${kafka.topic.commands}")
     public void listenToCommands(ConsumerRecord<String, String> record) {
         var headers = record.headers().toArray();
         var operation = Arrays.stream(headers).filter(header -> header.key().equals("operation")).findFirst().map(header -> new String(header.value())).orElseThrow();
