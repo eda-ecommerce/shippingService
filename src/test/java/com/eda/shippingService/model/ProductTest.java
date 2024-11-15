@@ -19,13 +19,13 @@ public class ProductTest {
 
     @Test
     void decrease() {
-        p1.adjustStock(-5);
+        p1.decreaseStock(5);
         assertEquals(5, p1.getPhysicalStock());
     }
 
     @Test
     void increaseStock() {
-        p1.adjustStock(5);
+        p1.increaseStock(5);
         assertEquals(15,p1.getPhysicalStock());
     }
 

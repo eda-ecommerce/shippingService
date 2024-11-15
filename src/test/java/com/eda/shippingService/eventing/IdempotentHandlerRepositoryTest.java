@@ -4,7 +4,7 @@ import com.eda.shippingService.application.eventHandlers.OrderRequestedEventHand
 import com.eda.shippingService.domain.dto.incoming.OrderRequestedDTO;
 import com.eda.shippingService.domain.entity.ProcessedMessage;
 import com.eda.shippingService.domain.events.OrderRequested;
-import com.eda.shippingService.infrastructure.repo.IdempotentHandlerRepository;
+import com.eda.shippingService.adapters.repo.IdempotentHandlerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

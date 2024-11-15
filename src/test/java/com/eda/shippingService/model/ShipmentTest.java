@@ -20,10 +20,9 @@ public class ShipmentTest {
         emptyShipment = new Shipment(
                 orderId,
                 dest,
-                origin,
                 null,
                 List.of(requested),
-                ShipmentStatus.RESERVED
+                ShipmentStatus.CONFIRMED
         );
     }
 
@@ -35,12 +34,12 @@ public class ShipmentTest {
         Shipment shipment = new Shipment(
                 orderId,
                 dest,
-                origin,
-                aPackage,
+                null,
                 List.of(requested),
-                ShipmentStatus.RESERVED
+                ShipmentStatus.CONFIRMED
         );
-        Assertions.assertTrue(shipment.checkContents());
+        Assertions.assertDoesNotThrow(() -> shipment.addPackage(aPackage));
+
     }
     @Test
     public void shouldInvalidateContents() {
@@ -50,12 +49,11 @@ public class ShipmentTest {
         Shipment shipment = new Shipment(
                 orderId,
                 dest,
-                origin,
-                aPackage,
+                null,
                 List.of(requested),
-                ShipmentStatus.RESERVED
+                ShipmentStatus.CONFIRMED
         );
-        Assertions.assertFalse(shipment.checkContents());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> shipment.addPackage(aPackage));
     }
 
     @Test
@@ -64,6 +62,7 @@ public class ShipmentTest {
                 new APackage(10f, 10f, 10f, 100f, List.of(requested))
         );
         Assertions.assertNotNull(emptyShipment.getAPackage());
+        Assertions.assertEquals(ShipmentStatus.PACKAGED, emptyShipment.getStatus());
     }
 
 
@@ -74,10 +73,9 @@ public class ShipmentTest {
         Shipment shipment = new Shipment(
                 orderId,
                 dest,
-                origin,
                 aPackage,
                 List.of(requested),
-                ShipmentStatus.RESERVED
+                ShipmentStatus.CONFIRMED
         );
         shipment.assignTrackingNumber(UUID.fromString("1f0000-0000-0000-0000-000000000000"));
         Assertions.assertNotNull(shipment.getAPackage().getTrackingNumber());

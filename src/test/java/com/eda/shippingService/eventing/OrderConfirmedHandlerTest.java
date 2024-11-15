@@ -8,7 +8,7 @@ import com.eda.shippingService.domain.entity.ProcessedMessage;
 import com.eda.shippingService.domain.entity.Shipment;
 import com.eda.shippingService.domain.entity.ShipmentStatus;
 import com.eda.shippingService.domain.events.OrderConfirmed;
-import com.eda.shippingService.infrastructure.repo.IdempotentHandlerRepository;
+import com.eda.shippingService.adapters.repo.IdempotentHandlerRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -40,12 +40,11 @@ public class OrderConfirmedHandlerTest {
         Shipment shipment = new Shipment(
                 quickUUID(1),
                 quickAddress("Street1"),
-                quickAddress("Street2"),
                 null,
                 List.of(
                         new OrderLineItem(quickUUID(2), 1)
                 ),
-                ShipmentStatus.RESERVED
+                ShipmentStatus.INCOMPLETE
         );
         OrderConfirmed orderConfirmedEvent = new OrderConfirmed(null, quickUUID(3), System.currentTimeMillis(),
                 new OrderConfirmedDTO(quickUUID(1), quickUUID(99), "23-12-2021", "READY_FOR_SHIPMENT", List.of(

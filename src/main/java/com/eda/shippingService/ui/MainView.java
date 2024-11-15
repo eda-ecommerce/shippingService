@@ -59,7 +59,7 @@ public class MainView extends VerticalLayout {
     }
 
     public ShipmentDTO createTestShipment(){
-        return shipmentService.requestShipment(UUID.randomUUID(),
+        return shipmentService.provideRequestedContents(UUID.randomUUID(),
                 new ShipmentContentsDTO(UUID.randomUUID(),
                         List.of(new OrderLineItemDTO(UUID.randomUUID(), 1))));
     }

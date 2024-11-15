@@ -33,19 +33,16 @@ public class TestHelpers {
     public static class ShipmentDTOBuilder {
         UUID orderId;
         AddressDTO destination;
-        AddressDTO origin;
         PackageDTO aPackage;
         List<OrderLineItemDTO> requestedProducts = new ArrayList<>();
         ShipmentStatus status;
 
         /**
          * @param destinationStreet: the street of the destination address
-         * @param originStreet: the street of the origin address
          */
-        public ShipmentDTOBuilder(UUID orderID, String destinationStreet, String originStreet, ShipmentStatus status){
+        public ShipmentDTOBuilder(UUID orderID, String destinationStreet, ShipmentStatus status){
             this.orderId = orderID;
             this.destination = quickAddressDTO(destinationStreet);
-            this.origin = quickAddressDTO(originStreet);
             this.status = status;
         }
 
@@ -65,7 +62,7 @@ public class TestHelpers {
         }
 
         public ShipmentDTO build(){
-            return new ShipmentDTO(orderId, destination, origin, aPackage, requestedProducts, status);
+            return new ShipmentDTO(orderId, destination, aPackage, requestedProducts, status);
         }
     }
 
@@ -82,12 +79,11 @@ public class TestHelpers {
                 new ShipmentDTO(
                         quickUUID(1),
                         new AddressDTO("street", "city", "state", "postalCode", "DE"),
-                        new AddressDTO("street2", "city", "state", "postalCode", "DE"),
                         new PackageDTO(quickUUID(999), quickUUID(3), new PackageDTO.PackageDimensions(1f,1f,1f,1f),1f, List.of(new OrderLineItemDTO(quickUUID(3), 1))),
                         List.of(new OrderLineItemDTO(quickUUID(3), 1)),
-                        ShipmentStatus.RESERVED
+                        ShipmentStatus.CONFIRMED
                 );
-        ShipmentDTO actual = new ShipmentDTOBuilder(quickUUID(1), "street", "street2", ShipmentStatus.RESERVED)
+        ShipmentDTO actual = new ShipmentDTOBuilder(quickUUID(1), "street", ShipmentStatus.CONFIRMED)
                 .withRequestedProduct(quickUUID(3), 1)
                 .withPackageContents(quickUUID(999), quickUUID(3), List.of(new OrderLineItemDTO(quickUUID(3), 1)))
                 .build();

@@ -31,7 +31,8 @@ public abstract class KafkaTest {
 	);
 
 	// For consuming
-	private ArrayList<ConsumerRecord<String, String>> consumedRecords = new ArrayList<>();
+	private ArrayList<ConsumerRecord<String, String>> consumedShipmentRecords = new ArrayList<>();
+	private ArrayList<ConsumerRecord<String, String>> consumedStockRecords = new ArrayList<>();
 	public final static ResettableCountDownLatch stockListenerLatch = new ResettableCountDownLatch(1);
 	public final static ResettableCountDownLatch shipmentListenerLatch = new ResettableCountDownLatch(1);
 
@@ -46,7 +47,8 @@ public abstract class KafkaTest {
 	void setUpEach() {
 		stockListenerLatch.reset();
 		shipmentListenerLatch.reset();
-		consumedRecords = new ArrayList<>();
+		consumedShipmentRecords = new ArrayList<>();
+		consumedStockRecords = new ArrayList<>();
 	}
 
 	@BeforeAll
@@ -54,7 +56,7 @@ public abstract class KafkaTest {
 		kafkaContainer.start();
 	}
 
-	void processRecord(ConsumerRecord<String, String> record){
+	ConsumerRecord<String, String> processRecord(ConsumerRecord<String, String> record){
 		log.info("Received message from topic: {}", record.topic());
 		log.info("---- Headers ----");
 		for (Header header : record.headers()) {
@@ -68,18 +70,18 @@ public abstract class KafkaTest {
             throw new RuntimeException(e);
         }
         log.info("-----------------");
-		consumedRecords.add(record);
+		return record;
 	}
 
 	@KafkaListener(topics = {"stock"})
 	void listenerStock(ConsumerRecord<String, String> record){
-		processRecord(record);
+		consumedStockRecords.add(processRecord(record));
 		stockListenerLatch.countDown();
 	}
 
 	@KafkaListener(topics = {"shipment"})
 	void listenerShipment(ConsumerRecord<String, String> record){
-		processRecord(record);
+		consumedShipmentRecords.add(processRecord(record));
 		shipmentListenerLatch.countDown();
 	}
 }
