@@ -1,6 +1,6 @@
 package com.eda.shippingService.application.queryHandlers;
 
-import com.eda.shippingService.infrastructure.repo.ShipmentRepository;
+import com.eda.shippingService.adapters.repo.ShipmentRepository;
 
 public class ListAllShipments {
 

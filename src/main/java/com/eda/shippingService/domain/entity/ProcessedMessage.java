@@ -1,6 +1,6 @@
 package com.eda.shippingService.domain.entity;
 
-import com.eda.shippingService.infrastructure.repo.MessageCompositeKey;
+import com.eda.shippingService.adapters.repo.MessageCompositeKey;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;

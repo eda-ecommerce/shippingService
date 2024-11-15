@@ -1,4 +1,4 @@
-package com.eda.shippingService.infrastructure.repo;
+package com.eda.shippingService.adapters.repo;
 
 import jakarta.persistence.Id;
 

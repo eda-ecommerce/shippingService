@@ -3,7 +3,7 @@ package com.eda.shippingService.application.eventHandlers;
 import com.eda.shippingService.application.service.ShipmentService;
 import com.eda.shippingService.domain.entity.ProcessedMessage;
 import com.eda.shippingService.domain.events.OrderConfirmed;
-import com.eda.shippingService.infrastructure.repo.IdempotentHandlerRepository;
+import com.eda.shippingService.adapters.repo.IdempotentHandlerRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

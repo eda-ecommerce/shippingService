@@ -5,7 +5,7 @@ import com.eda.shippingService.domain.commands.BoxShipment;
 import com.eda.shippingService.domain.dto.common.PackageDimensionsDTO;
 import com.eda.shippingService.domain.dto.incoming.IncomingPackageDTO;
 import com.eda.shippingService.domain.entity.ProcessedMessage;
-import com.eda.shippingService.infrastructure.repo.IdempotentHandlerRepository;
+import com.eda.shippingService.adapters.repo.IdempotentHandlerRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
