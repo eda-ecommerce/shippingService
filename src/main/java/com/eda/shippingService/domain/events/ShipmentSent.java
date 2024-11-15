@@ -14,7 +14,6 @@ public class ShipmentSent extends DomainEvent<ShipmentSent.ShipmentSentPayload> 
                 payload.getOrderId(),
                 PackageDTO.fromEntity(payload.getAPackage()),
                 AddressDTO.fromEntity(payload.getDestination()),
-                AddressDTO.fromEntity(payload.getOrigin()),
                 payload.getStatus()
         ));
     }
@@ -23,7 +22,6 @@ public class ShipmentSent extends DomainEvent<ShipmentSent.ShipmentSentPayload> 
             UUID orderId,
             PackageDTO packageDTO,
             AddressDTO dest,
-            AddressDTO origin,
             ShipmentStatus status
     ){}
 }

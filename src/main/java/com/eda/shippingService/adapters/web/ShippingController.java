@@ -27,7 +27,7 @@ public class ShippingController {
     @Operation(summary = "Request a shipment")
     @PostMapping("/{orderId}")
     public ResponseEntity<ShipmentDTO> requestShipment(@PathVariable UUID orderId, @RequestBody ShipmentContentsDTO shipmentDTO) {
-        return ResponseEntity.ok(shipmentService.requestShipment(orderId, shipmentDTO));
+        return ResponseEntity.ok(shipmentService.provideRequestedContents(orderId, shipmentDTO));
     }
 
     @PostMapping("/{orderId}/status")

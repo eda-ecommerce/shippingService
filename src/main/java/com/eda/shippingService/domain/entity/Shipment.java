@@ -1,7 +1,6 @@
 package com.eda.shippingService.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,42 +9,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
-@SuppressWarnings("JpaDataSourceORMInspection")
 public class Shipment{
     //We use the orderId as the primary key, as it is unique and lets us match it to order way quicker
     @Getter
     @Id
     private UUID orderId;
 
-    //Due to the nature of embedding stuff in the same table, I had to rename the columns
-    //Is there a better solution?
     @Embedded
-    @AttributeOverrides(
-            {
-                    @AttributeOverride(name = "street", column = @Column(name = "destination_street")),
-                    @AttributeOverride(name = "city", column = @Column(name = "destination_city")),
-                    @AttributeOverride(name = "state", column = @Column(name = "destination_state")),
-                    @AttributeOverride(name = "postalCode", column = @Column(name = "destination_postalCode")),
-                    @AttributeOverride(name = "country", column = @Column(name = "destination_country"))
-            }
-    )
     private Address destination;
-    @Embedded
-    @AttributeOverrides(
-            {
-                    @AttributeOverride(name = "street", column = @Column(name = "origin_street")),
-                    @AttributeOverride(name = "city", column = @Column(name = "origin_city")),
-                    @AttributeOverride(name = "state", column = @Column(name = "origin_state")),
-                    @AttributeOverride(name = "postalCode", column = @Column(name = "origin_postalCode")),
-                    @AttributeOverride(name = "country", column = @Column(name = "origin_country"))
-            }
-    )
-    private Address origin;
 
     //At the moment we assume one package per shipment, but this could easily be changed to a list of packages
     @OneToOne(cascade = CascadeType.DETACH)
@@ -53,24 +28,28 @@ public class Shipment{
 
     @ElementCollection(fetch = FetchType.LAZY)
     private List<OrderLineItem> requestedProducts;
+    private Boolean reserved = false;
+
     @Transient
-    private HashMap<UUID, Integer> requestedHashMap = new HashMap<>();
+    private HashMap<UUID, Integer> requestedHashMap;
 
     private ShipmentStatus status;
 
-    public Shipment(UUID orderId, Address destination, Address origin, APackage aPackage, List<OrderLineItem> orderLineItems, ShipmentStatus status){
+    public Shipment(UUID orderId, Address destination, APackage aPackage, List<OrderLineItem> orderLineItems, ShipmentStatus status){
         this.orderId = orderId;
         this.destination = destination;
-        this.origin = origin;
         this.aPackage = aPackage;
-        this.requestedProducts = orderLineItems;
+        this.requestedProducts = orderLineItems != null ?orderLineItems: List.of();
         this.status = status;
-        for (OrderLineItem orderLineItem : orderLineItems){
-            requestedHashMap.put(orderLineItem.productId(), orderLineItem.quantity());
-        }
     }
 
     public HashMap<UUID, Integer> getRequestedProductsAsHashMap(){
+        if (requestedHashMap == null){
+            requestedHashMap = new HashMap<>();
+            for (OrderLineItem orderLineItem : this.getRequestedProducts()){
+                requestedHashMap.put(orderLineItem.productId(), orderLineItem.quantity());
+            }
+        }
         return requestedHashMap;
     }
 
@@ -78,9 +57,22 @@ public class Shipment{
         return requestedHashMap.getOrDefault(productId, 0);
     }
 
+    /**
+     * Adds a package and sets the status to packaged,
+     * if the shipment is confirmed and the contents are the requested products
+     * @throws IllegalStateException if the shipment is not confirmed
+     * @throws IllegalArgumentException if the package contains products not requested or the quantities are incorrect
+     * @param aPackage the package to add
+     */
     public void addPackage(APackage aPackage){
-        this.aPackage = aPackage;
-        this.status = ShipmentStatus.PACKAGED;
+        if (this.status == ShipmentStatus.CONFIRMED){
+            aPackage.validateContents(this.requestedProducts);
+            this.aPackage = aPackage;
+            this.status = ShipmentStatus.PACKAGED;
+        }
+        else {
+            throw new IllegalStateException("Shipment must be confirmed before it can be packed");
+        }
     }
 
     public void assignTrackingNumber(UUID trackingNumber){
@@ -89,51 +81,30 @@ public class Shipment{
 
     public boolean validateAddresses()
     {
-        return destination.validate() && origin.validate();
+        return destination.validate();
     }
 
+    /**
+     * Checks if the contents of the package match the requested products
+     * @return true if the contents match the requested products
+     */
     public boolean checkContents(){
-        HashMap<UUID, Integer> expected = getRequestedProductsAsHashMap();
-        for (OrderLineItem orderLineItem: aPackage.getContents()){
-            if (expected.get(orderLineItem.productId()) == null || expected.get(orderLineItem.productId()) > orderLineItem.quantity()){
-                return false;
-            }
-        }
-        return true;
+        return aPackage.validateContents(requestedProducts);
     }
 
     public void approve(){
-        if (this.status == ShipmentStatus.RESERVED || this.status == null){
-            this.status = ShipmentStatus.APPROVED;
+        if (this.status == ShipmentStatus.INCOMPLETE && this.reserved && validateAddresses()){
+            this.status = ShipmentStatus.CONFIRMED;
         } else {
-            throw new IllegalStateException("Shipment is already in state: "+this.status+" and cannot be approved.");
+            throw new IllegalStateException("Shipment is in state: "+this.status+" and cannot be approved.");
         }
-    }
-
-    public void packed(){
-        if (this.status == ShipmentStatus.APPROVED){
-            if(checkContents()) {
-                this.status = ShipmentStatus.PACKAGED;
-            }
-            throw new IllegalStateException("Shipment incomplete, please check contents.");
-        }
-        throw new IllegalStateException("Shipment must be approved before it can be packed");
-
     }
 
     public void send(){
         if (this.status != ShipmentStatus.PACKAGED){
             throw new IllegalStateException("Shipment must be packaged before it can be sent");
         }
-        assignTrackingNumber(UUID.randomUUID());
         this.status = ShipmentStatus.SHIPPED;
-    }
-
-    public void inDelivery(){
-        if (this.status != ShipmentStatus.SHIPPED){
-            throw new IllegalStateException("That cant be");
-        }
-        this.status = ShipmentStatus.IN_DELIVERY;
     }
 
     public void delivered(){
@@ -143,11 +114,11 @@ public class Shipment{
         this.status = ShipmentStatus.DELIVERED;
     }
 
-    public void reserved(){
-        if (this.status == null || this.status != ShipmentStatus.REQUESTED){
+    public void reserve(){
+        if (this.status != ShipmentStatus.INCOMPLETE || this.reserved){
             throw new IllegalStateException("Shipment cannot be reserved again. Current status: " + this.status);
         }
-        this.status = ShipmentStatus.RESERVED;
+        this.reserved = true;
     }
 
 }

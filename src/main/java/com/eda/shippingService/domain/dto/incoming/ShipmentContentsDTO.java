@@ -2,6 +2,7 @@ package com.eda.shippingService.domain.dto.incoming;
 
 import com.eda.shippingService.domain.dto.common.OrderLineItemDTO;
 import com.eda.shippingService.domain.entity.Shipment;
+import com.eda.shippingService.domain.entity.ShipmentStatus;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,9 +17,8 @@ public record ShipmentContentsDTO(
                 orderID,
                 null,
                 null,
-                null,
                 requestedProducts.stream().map(OrderLineItemDTO::toEntity).toList(),
-                null
+                ShipmentStatus.INCOMPLETE
         );
     }
 }

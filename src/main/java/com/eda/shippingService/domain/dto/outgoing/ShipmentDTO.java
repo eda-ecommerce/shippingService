@@ -16,8 +16,6 @@ public record ShipmentDTO(
         UUID orderId,
         @JsonProperty("destination")
         AddressDTO destination,
-        @JsonProperty("origin")
-        AddressDTO origin,
         @JsonProperty("package")
         PackageDTO aPackage,
         @JsonProperty("requestedProducts")
@@ -28,7 +26,6 @@ public record ShipmentDTO(
     public Shipment toEntity(){
         return new Shipment(orderId,
                 destination.toEntity(),
-                origin.toEntity(),
                 aPackage != null ? aPackage.toEntity() : null,
                 this.requestedProducts().stream()
                         .map(OrderLineItemDTO::toEntity)
@@ -41,7 +38,6 @@ public record ShipmentDTO(
         return new ShipmentDTO(
                 shipment.getOrderId(),
                 AddressDTO.fromEntity(shipment.getDestination()),
-                AddressDTO.fromEntity(shipment.getOrigin()),
                 shipment.getAPackage() != null ?PackageDTO.fromEntity(shipment.getAPackage()) : null,
                 shipment.getRequestedProducts().stream()
                         .map(OrderLineItemDTO::fromEntity).toList(),

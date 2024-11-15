@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import lombok.*;
 import org.springframework.lang.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,5 +32,21 @@ public class APackage extends AbstractEntity{
 
     public void assignTrackingNumber(UUID trackingNumber){
         this.trackingNumber = trackingNumber;
+    }
+
+    public Boolean validateContents(List<OrderLineItem> requested){
+        var requestedHashMap = new HashMap<UUID, Integer>();
+        for (OrderLineItem orderLineItem : requested){
+            requestedHashMap.put(orderLineItem.productId(), orderLineItem.quantity());
+        }
+        for (OrderLineItem orderLineItem : contents){
+            if (requestedHashMap.get(orderLineItem.productId()) == null){
+                throw new IllegalArgumentException("Package contains product not requested");
+            }
+            if (!requestedHashMap.get(orderLineItem.productId()).equals(orderLineItem.quantity())){
+                throw new IllegalArgumentException("Package contains more or less of a product than requested");
+            }
+        }
+        return true;
     }
 }

@@ -11,7 +11,9 @@ public interface StockService {
     void registerNewProduct(UUID productId, int quantity);
     void reserveStock(UUID productID, int quantity) throws NotEnoughStockException;
     void releaseStock(UUID productID, int quantity);
-    void adjustStock(UUID productID, int quantity);
+    void increaseStock(UUID productID, int quantity);
+    void decreaseStock(UUID productID, int quantity);
+    void decreaseAndReleaseStock(UUID productID, int quantity);
     void setStock(UUID productID, int actualStock, int reservedStock);
     void batchAdjustStock(Map<UUID, Integer> hashMap);
     void batchAdjustStock(List<OrderLineItem> orderLineItems);

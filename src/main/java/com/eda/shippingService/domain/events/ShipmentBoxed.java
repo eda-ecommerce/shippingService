@@ -17,7 +17,6 @@ public class ShipmentBoxed extends DomainEvent<ShipmentBoxed.ShipmentBoxedPayloa
                 payload.getOrderId(),
                 PackageDTO.fromEntity(payload.getAPackage()),
                 AddressDTO.fromEntity(payload.getDestination()),
-                AddressDTO.fromEntity(payload.getOrigin()),
                 payload.getStatus()
         ));
     }
@@ -30,8 +29,6 @@ public class ShipmentBoxed extends DomainEvent<ShipmentBoxed.ShipmentBoxedPayloa
             PackageDTO packageDTO,
             @JsonProperty("destination")
             AddressDTO dest,
-            @JsonProperty("origin")
-            AddressDTO origin,
             @JsonProperty("status")
             ShipmentStatus status
     ){}
