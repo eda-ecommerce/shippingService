@@ -8,7 +8,7 @@ import com.eda.shippingService.domain.entity.Product;
 import com.eda.shippingService.domain.events.AvailableStockAdjusted;
 import com.eda.shippingService.domain.events.OutOfStock;
 import com.eda.shippingService.domain.events.StockCritical;
-import com.eda.shippingService.infrastructure.repo.ProductRepository;
+import com.eda.shippingService.adapters.repo.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,13 +78,28 @@ public class StockServiceImpl implements StockService {
      * @param productID the product id that is affected
      * @param quantity takes both, negative and positive values
      */
-    public void adjustStock(UUID productID, int quantity) {
+    public void increaseStock(UUID productID, int quantity) {
         var product = productRepository.findById(productID).orElseThrow(() -> new NoSuchElementException("No product exists with id: "+productID));
-        product.adjustStock(quantity);
+        product.increaseStock(quantity);
         eventPublisher.publish(new AvailableStockAdjusted(StockDTO.fromProduct(product)), stockTopic);
         productRepository.save(product);
         if (product.isCritical()) publishStockCritical(product);
     }
+
+    public void decreaseStock(UUID productID, int quantity) {
+        var product = productRepository.findById(productID).orElseThrow(() -> new NoSuchElementException("No product exists with id: "+productID));
+        product.decreaseStock(quantity);
+        eventPublisher.publish(new AvailableStockAdjusted(StockDTO.fromProduct(product)), stockTopic);
+        productRepository.save(product);
+        if (product.isCritical()) publishStockCritical(product);    }
+
+    public void decreaseAndReleaseStock(UUID productID, int quantity) {
+        var product = productRepository.findById(productID).orElseThrow(() -> new NoSuchElementException("No product exists with id: "+productID));
+        product.decreaseStock(quantity);
+        product.releaseStock(quantity);
+        eventPublisher.publish(new AvailableStockAdjusted(StockDTO.fromProduct(product)), stockTopic);
+        productRepository.save(product);
+        if (product.isCritical()) publishStockCritical(product);    }
 
     /**
      * Method for manually correcting stock info
@@ -106,13 +121,13 @@ public class StockServiceImpl implements StockService {
      */
     public void batchAdjustStock(Map<UUID, Integer> map) {
         for(UUID id: map.keySet()){
-            adjustStock(id, map.get(id));
+            increaseStock(id, map.get(id));
         }
     }
 
     public void batchAdjustStock(List<OrderLineItem> orderLineItems) {
         for(OrderLineItem item: orderLineItems){
-            adjustStock(item.productId(), item.quantity());
+            increaseStock(item.productId(), item.quantity());
         }
     }
 

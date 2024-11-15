@@ -5,7 +5,7 @@ import com.eda.shippingService.domain.dto.incoming.ShipmentContentsDTO;
 import com.eda.shippingService.domain.dto.common.OrderLineItemDTO;
 import com.eda.shippingService.domain.entity.ProcessedMessage;
 import com.eda.shippingService.domain.events.OrderRequested;
-import com.eda.shippingService.infrastructure.repo.IdempotentHandlerRepository;
+import com.eda.shippingService.adapters.repo.IdempotentHandlerRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +32,8 @@ public class OrderRequestedEventHandler implements EventHandler<OrderRequested> 
         }
         // Transforming this from event to DTO seems counterintuitive,
         // should the handler support taking events directly?
-        shipmentService.requestShipment(event.getMessageValue().orderId(),new ShipmentContentsDTO(
+        shipmentService.provideRequestedContents(event.getMessageValue().orderId(),new ShipmentContentsDTO(
                 event.getMessageValue().customerId(),
-                //TODO Where do the addresses come from? --> PrepareShipment, but via controller?
                 event.getMessageValue().products().stream().map(product -> new OrderLineItemDTO(product.productId(), product.quantity())).toList()));
         idempotentHandlerRepository.save(new ProcessedMessage(event.getMessageId(), this.getClass().getSimpleName()));
     }

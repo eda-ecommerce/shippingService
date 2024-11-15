@@ -35,8 +35,18 @@ public class Product extends AbstractEntity{
         this.reservedStock = 0;
     }
 
-    public void adjustStock(Integer amount) {
+    public void increaseStock(Integer amount) {
+        if (amount < 0){
+            throw new IllegalArgumentException("Amount must be positive");
+        }
         this.physicalStock = this.physicalStock + amount;
+    }
+
+    public void decreaseStock(Integer amount) {
+        if (amount < 0){
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+        this.physicalStock = this.physicalStock - amount;
     }
 
     public void reserveStock(Integer amount) throws NotEnoughStockException {
