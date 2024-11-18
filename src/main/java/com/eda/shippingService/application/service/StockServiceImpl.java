@@ -96,6 +96,7 @@ public class StockServiceImpl implements StockService {
     public void decreaseAndReleaseStock(UUID productID, int quantity) {
         var product = productRepository.findById(productID).orElseThrow(() -> new NoSuchElementException("No product exists with id: "+productID));
         product.decreaseStock(quantity);
+        // this check might be unnecessary, but we need to make sure that we do not release more stock than we have reserved
         product.releaseStock(quantity);
         eventPublisher.publish(new AvailableStockAdjusted(StockDTO.fromProduct(product)), stockTopic);
         productRepository.save(product);
@@ -108,6 +109,7 @@ public class StockServiceImpl implements StockService {
      * @param reservedStock reserved stock if applicable
      */
     public void setStock(UUID productID, int physicalStock, int reservedStock) {
+        if (reservedStock > physicalStock) throw new IllegalArgumentException("Reserved stock cannot be higher than physical stock");
         var product = productRepository.findById(productID).orElseThrow(() -> new NoSuchElementException("No product exists with id: "+productID));
         product.setPhysicalStock(physicalStock);
         product.setReservedStock(reservedStock);
